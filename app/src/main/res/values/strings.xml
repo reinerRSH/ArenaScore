@@ -1,0 +1,11 @@
+<resources>
+    //login
+    <string name="app_name">Arena</string>
+    <string name="Titulo_app">ARENA</string>
+    <string name="EmailLogin">Email</string>
+    <string name="PasswordLogin">Password</string>
+
+    //mensaje de errores
+    <string name="Campo_vacio">Los campos no pueden estar vacios</string>
+    <string name="Autenticacion_fallida">Autenticacion Fallida</string>
+</resources>

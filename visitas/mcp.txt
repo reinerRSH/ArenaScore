@@ -1,0 +1,80 @@
+## Stitch Instructions
+
+Get the images and code for the following Stitch project's screens:
+
+## Project
+Title: Elite Athlete OS
+ID: 11858485135776286060
+
+## Screens:
+1. Login Arena (Enhanced Background)
+    ID: 36cc3ee8adc44cee9f79307311c63a40
+
+2. Padel Staff Console
+    ID: 4cd64c05dc2141258e3211f97db71425
+
+3. Crossfit Dashboard
+    ID: 4d3450447f5c4660827dddd136b2c4a8
+
+4. Sport Selection
+    ID: 89782e8b4fa44b11983602b13d5d85a6
+
+5. Ranking Update Flow
+    ID: 28251da6788c4590b5d7086cc9ebee2c
+
+6. Padel Dashboard
+    ID: 561728f0f4f84601bb8e5bc3552d7043
+
+7. Design System
+    ID: asset-stub-assets-4c01a777b53c4557a2c7d4e5ae4180ad-1779373932686
+
+8. Leaderboard Crossfit
+    ID: eb636fc756bf4f10ae613a76bbe7541c
+
+9. Staff Admin Console (with Back)
+    ID: 70464f315b69458287f1360da9e725e0
+
+10. Ranking Update Flow (with Back)
+    ID: 47f95fc4b8a54427992c44fc2628db40
+
+11. Judge Console (with Back)
+    ID: 01dab28ccc82492196bda7911dec7857
+
+12. Padel Staff Console (with Back)
+    ID: 8c38115404164c1fa2524d77bfba5618
+
+13. Tournament Registration & Payment
+    ID: 8ea1adb5ebea4510bc35391e34a15625
+
+14. Athlete Profile
+    ID: fd5784a437bb487a80c4433b85039930
+
+15. Discover Events
+    ID: 8cfc36c12e6343569533495f36d11d08
+
+16. Settings
+    ID: 16aa5242e7f94c98b5b1b99071c110f0
+
+Use a utility like `curl -L` to download the hosted URLs.
+
+
+
+## Stitch Instructions
+
+Get the images and code for the following Stitch project's screens:
+
+## Project
+Title: Elite Athlete OS
+ID: 11858485135776286060
+
+## Screens:
+1. Tournament Brackets
+    ID: d63802f1ff4b4f309a48fb7165daf1d4
+
+2. Rank Up Celebration
+    ID: f958ceff7acc4e748e3d2e0424f9e863
+
+3. Database Schema SQL
+    ID: 094bac04bcf3472f8c7b29e9ead792e9
+
+Use a utility like `curl -L` to download the hosted URLs.
