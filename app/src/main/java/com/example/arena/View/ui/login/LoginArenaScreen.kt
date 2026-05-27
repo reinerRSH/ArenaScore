@@ -1,10 +1,12 @@
 package com.example.arena.View.ui.login
 
+import android.R.attr.onClick
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import android.widget.Toast
+import android.widget.Toast.makeText
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -23,6 +25,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
@@ -53,7 +56,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.semantics.Role.Companion.Button
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -66,9 +68,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.arena.R
 import com.example.arena.View.ui.theme.EliteAthleteOSTheme
 import com.example.arena.ViewModel.LoginViewModel
@@ -93,7 +93,7 @@ fun LoginArenaScreen(
                 }
             }
             is LoginState.Error -> {
-                Toast.makeText(context, uiState.message, Toast.LENGTH_SHORT).show()
+                makeText(context, uiState.message, Toast.LENGTH_SHORT).show()
             }
             else -> {}
         }
@@ -101,8 +101,10 @@ fun LoginArenaScreen(
 
     LoginArenaContent(
         uiState = uiState,
+        navController = navController,
         onLogin = { email, password ->
-            viewModel.loginUsuario(email, password)
+            viewModel.loginUsuario(email, password, rememberMe = false)
+
         }
     )
 }
@@ -110,8 +112,10 @@ fun LoginArenaScreen(
 @Composable
 fun LoginArenaContent(
     uiState: LoginState,
-    onLogin: (String, String) -> Unit
+    onLogin: (String, String) -> Unit,
+    navController: NavController
 ) {
+    val context = LocalContext.current
     var currentMode by remember { mutableStateOf(LoginMode.ATHLETE) }
     var email by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
@@ -133,7 +137,7 @@ fun LoginArenaContent(
         contentAlignment = Alignment.Center
     ) {
         Image(
-            painter = painterResource(id = R.drawable.backgroundloging),
+            painter = painterResource(id = R.drawable.logo_branding),
             contentDescription = "fondo login",
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
@@ -286,7 +290,8 @@ fun LoginArenaContent(
                     }
 
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth()
+                            .clickable { rememberMe = !rememberMe },
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -310,7 +315,7 @@ fun LoginArenaContent(
                             color = MaterialTheme.colorScheme.primary,
                             fontSize = 12.sp,
                             modifier = Modifier
-                                .clickable { }
+                                .clickable { makeText(context, "Forgot Password", Toast.LENGTH_SHORT).show()}
                                 .padding(4.dp)
                         )
                     }
@@ -348,25 +353,41 @@ fun LoginArenaContent(
                 }
 
                 val registerText = buildAnnotatedString {
-                    withStyle(style = MaterialTheme.typography.bodyMedium.toSpanStyle()) {
+                    withStyle(style = MaterialTheme.typography.bodyMedium.toSpanStyle().copy(
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )) {
                         append("Don't have an account? ")
                     }
+                    pushStringAnnotation(tag = "register", annotation = "register")
                     withStyle(
                         style = MaterialTheme.typography.bodyMedium.toSpanStyle()
-                            .copy(color = MaterialTheme.colorScheme.primary)
+                            .copy(
+                                color = MaterialTheme.colorScheme.primary,
+                                fontWeight = FontWeight.Bold
+                            )
                     ) {
                         append("Register")
                     }
-                    pushStringAnnotation(tag = "register", annotation = "register")
                     pop()
                 }
-                Text(
+
+                ClickableText(
                     text = registerText,
-                    fontSize = 12.sp,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(24.dp),
-                    textAlign = TextAlign.Center
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        textAlign = TextAlign.Center,
+                        fontSize = 12.sp
+                    ),
+                    onClick = { offset ->
+                        registerText.getStringAnnotations(tag = "register", start = offset, end = offset)
+                            .firstOrNull()?.let {
+                                makeText(context, "Accediendo al registro...", Toast.LENGTH_SHORT).show()
+                                // Aquí puedes añadir la navegación real, por ejemplo:
+                                // navController.navigate("register_screen")
+                            }
+                    }
                 )
             } else {
                 Column(modifier = Modifier.fillMaxWidth()) {
@@ -516,7 +537,8 @@ fun ArenaLoginPreview() {
         Surface(modifier = Modifier.fillMaxSize()) {
             LoginArenaContent(
                 uiState = LoginState.Idle,
-                onLogin = { _, _ -> }
+                onLogin = { _, _ -> },
+                navController = NavController(LocalContext.current)
             )
         }
     }

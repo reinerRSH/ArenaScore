@@ -20,4 +20,7 @@ interface UserDao {
 
     @Query("DELETE FROM user_table")
     suspend fun deleteUser ()
+
+    @Query ("SELECT EXISTS (SELECT 1 FROM user_table LIMIT 1)")
+    suspend fun getRemenberedUser(): UserEntity?
 }

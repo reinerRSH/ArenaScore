@@ -55,7 +55,8 @@ dependencies {
 
     // Hilt - Inyección de Dependencias
     implementation(libs.hilt.android)
-    implementation(libs.firebase.auth.ktx)
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
     ksp(libs.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
 
@@ -90,5 +91,5 @@ dependencies {
     // FireBase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
-    implementation(libs.firebase.auth.ktx)
+    implementation(libs.firebase.auth)
 }
