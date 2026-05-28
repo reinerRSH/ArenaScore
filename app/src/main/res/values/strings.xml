@@ -1,11 +1,52 @@
 <resources>
-    //login
     <string name="app_name">Arena</string>
-    <string name="Titulo_app">ARENA</string>
-    <string name="EmailLogin">Email</string>
-    <string name="PasswordLogin">Password</string>
+    <string name="titulo_app">ARENA</string>
+    <string name="command_center_access">COMMAND CENTER ACCESS</string>
 
-    //mensaje de errores
-    <string name="Campo_vacio">Los campos no pueden estar vacios</string>
-    <string name="Autenticacion_fallida">Autenticacion Fallida</string>
+    <string name="mode_athlete">ATHLETE</string>
+    <string name="mode_staff">STAFF</string>
+
+    <string name="label_email">EMAIL</string>
+    <string name="placeholder_email">athlete@arena.com</string>
+    <string name="label_password">PASSWORD</string>
+    <string name="label_Confirmpassword"> CONFIRM PASSWORD</string>
+    <string name="description_hide_password">Hide password</string>
+    <string name="description_show_password">Show password</string>
+    <string name="description_login_background">Login background image</string>
+
+    <string name="remember_me">Remember me</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="btn_login">LOGIN</string>
+
+    <string name="dont_have_account">Don\'t have an account? </string>
+    <string name="Register"> Register</string>
+    <string name="toast_accessing_register">Accediendo al registro...</string>
+
+    <string name="staff_restricted_access">Restricted access area. Valid clearance required.</string>
+    <string name="label_clearance_id">CLEARANCE ID / EMAIL</string>
+    <string name="placeholder_staff_id">STAFF-ID-001</string>
+    <string name="label_access_code">ACCESS CODE</string>
+    <string name="request_access_reset">Request Access Reset</string>
+    <string name="btn_authenticate">AUTHENTICATE</string>
+
+    <string name="campo_vacio">Los campos no pueden estar vacíos</string>
+    <string name="autenticacion_fallida">Autenticación Fallida</string>
+
+    <string name="registration_successful">Registration Successful!</string>
+    <string name="passwords_do_not_match">Passwords do not match.</string>
+    <string name="join_the_arena">JOIN THE ARENA</string>
+    <string name="institutional_performance_analytics">INSTITUTIONAL PERFORMANCE &amp; ANALYTICS</string>
+    <string name="label_first_name">FIRST NAME</string>
+    <string name="placeholder_first_name">ERIK</string>
+    <string name="label_last_name">LAST NAME</string>
+    <string name="placeholder_last_name">VON</string>
+    <string name="label_email_address">EMAIL ADDRESS</string>
+    <string name="placeholder_email_register">ERIK.V@ARENA.SYSTEMS</string>
+    <string name="label_security_credentials">SECURITY CREDENTIALS</string>
+    <string name="label_confirm_credentials">CONFIRM CREDENTIALS</string>
+    <string name="btn_register">REGISTER</string>
+    <string name="or_continue_with">OR CONTINUE WITH</string>
+    <string name="continue_with_google">Continue with Google</string>
+    <string name="already_have_account">Already have an account? </string>
+    <string name="login_action">Login</string>
 </resources>

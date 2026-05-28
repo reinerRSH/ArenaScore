@@ -4,5 +4,6 @@ data class UserMapper(
     val id: String,
     val email: String,
     val name: String,
-    val role: String
+    val role: String,
+    val lastName: String
 )

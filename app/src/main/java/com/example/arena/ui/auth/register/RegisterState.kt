@@ -1,4 +1,4 @@
-package com.example.arena.View.ui.login.states
+package com.example.arena.ui.auth.register
 
 sealed interface RegisterState {
 

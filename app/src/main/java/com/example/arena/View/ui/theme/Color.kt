@@ -11,3 +11,12 @@ val ArenaTextPrimary = Color(0xFFDCE4E4)
 val ArenaTextVariant = Color(0xFFB9CACA)
 val ArenaErrorContainer = Color(0xFF93000A)
 
+// Colores adicionales para UI
+val ArenaUnfocusedBorder = Color(0xFF171616)
+val ArenaStaffBorder = Color(0xFF2D3748)
+val ArenaWarning = Color(0xFFEF4444)
+
+
+
+val CardRegister = Color(0xDD0D1515) // Con transparencia para el efecto glass
+val PrimaryNeon = Color(0xFF00DCE5) // El azul neón brillante

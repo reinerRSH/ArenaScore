@@ -1,6 +1,6 @@
-package com.example.arena.ViewModel
+package com.example.arena.ui.auth.login
 
-import android.app.Application
+import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -11,26 +11,28 @@ import com.example.arena.Model.Di.Domain.UserMapper
 import com.example.arena.Model.Di.Mappers.ToEntity
 import com.example.arena.R
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 
+
+
 sealed interface LoginState{
-    object Idle : LoginState
-    object Loading: LoginState
-    object Success: LoginState
+    data object Idle : LoginState
+    data object Loading: LoginState
+    data object Success: LoginState
     data class  Error(val message: String): LoginState
 }
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val auth: FirebaseAuth,
-    private val application: Application,
+    @ApplicationContext private val context: Context,
     private val userDao: UserDao
 
 ) : ViewModel() {
@@ -41,7 +43,7 @@ class LoginViewModel @Inject constructor(
 
     fun loginUsuario(email: String, password: String, rememberMe: Boolean){
         if (email.isBlank() || password.isBlank()){
-            uiState = LoginState.Error(application.getString(R.string.Campo_vacio))
+            uiState = LoginState.Error(context.getString(R.string.campo_vacio))
             return
 
         }
@@ -55,34 +57,28 @@ class LoginViewModel @Inject constructor(
                 val authResult = auth.signInWithEmailAndPassword(email, password).await()
                 val firebaseUser = authResult.user
 
-                when (firebaseUser){
-                    null -> uiState = LoginState.Error(application.getString(R.string.Autenticacion_fallida))
-                    else ->{
+                when (firebaseUser) {
+                    null -> uiState = LoginState.Error(context.getString(R.string.autenticacion_fallida))
+                    else -> {
                         val loggedUser = UserMapper(
                             id = firebaseUser.uid,
                             email = firebaseUser.email ?: email,
                             name = "Athlete",
-                            role = "ATHLETE"
+                            lastName = "Athlete",
+                            role = "ATHLETE",
                         )
 
-                        withContext(Dispatchers.IO){
-
-                            when(rememberMe){
+                        withContext(Dispatchers.IO) {
+                            when (rememberMe) {
                                 true -> userDao.insertUser(loggedUser.ToEntity(isRemebered = true))
                                 false -> userDao.deleteUser()
                             }
-
-
                         }
                         uiState = LoginState.Success
                     }
                 }
-
-
-
-                uiState = LoginState.Success
-            }catch (e: Exception){
-                uiState = LoginState.Error(e.message ?: application.getString(R.string.Autenticacion_fallida))
+            } catch (e: Exception) {
+                uiState = LoginState.Error(e.message ?: context.getString(R.string.autenticacion_fallida))
             }
         }
     }

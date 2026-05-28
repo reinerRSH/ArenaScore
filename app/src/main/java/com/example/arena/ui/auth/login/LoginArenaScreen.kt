@@ -1,6 +1,5 @@
-package com.example.arena.View.ui.login
+package com.example.arena.ui.auth.login
 
-import android.R.attr.onClick
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.imePadding
@@ -56,7 +55,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -70,9 +69,13 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.arena.R
+import com.example.arena.View.ui.theme.ArenaStaffBorder
+import com.example.arena.View.ui.theme.ArenaUnfocusedBorder
+import com.example.arena.View.ui.theme.ArenaWarning
 import com.example.arena.View.ui.theme.EliteAthleteOSTheme
-import com.example.arena.ViewModel.LoginViewModel
-import com.example.arena.ViewModel.LoginState
+import androidx.compose.ui.text.buildAnnotatedString
+import com.example.arena.navigation.Screen
+import com.example.arena.LoginMode
 
 
 @Composable
@@ -86,9 +89,9 @@ fun LoginArenaScreen(
     LaunchedEffect(uiState) {
         when (uiState) {
             is LoginState.Success -> {
-                navController.navigate("home_Screen") {
-                    popUpTo("login_Screen") {
-                        inclusive = true
+                navController.navigate(Screen.Home.route) {
+                    popUpTo(Screen.Login.route) {
+                        this.inclusive = true
                     }
                 }
             }
@@ -138,7 +141,7 @@ fun LoginArenaContent(
     ) {
         Image(
             painter = painterResource(id = R.drawable.logo_branding),
-            contentDescription = "fondo login",
+            contentDescription = stringResource(R.string.description_login_background),
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
@@ -156,14 +159,14 @@ fun LoginArenaContent(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "ARENA",
+                text = stringResource(R.string.titulo_app),
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Black,
                 letterSpacing = (-1).sp,
                 color = MaterialTheme.colorScheme.onSurface
             )
             Text(
-                text = "COMMAND CENTER ACCESS",
+                text = stringResource(R.string.command_center_access),
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Bold,
                 letterSpacing = 2.sp,
@@ -177,7 +180,7 @@ fun LoginArenaContent(
                     .fillMaxWidth()
                     .height(48.dp)
                     .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(8.dp))
-                    .border(1.dp, Color(0xFF2D3748), RoundedCornerShape(8.dp))
+                    .border(1.dp, ArenaStaffBorder, RoundedCornerShape(8.dp))
                     .padding(4.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -194,7 +197,7 @@ fun LoginArenaContent(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "ATHLETE",
+                        text = stringResource(R.string.mode_athlete),
                         color = if (isAthlete) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
@@ -215,7 +218,7 @@ fun LoginArenaContent(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "STAFF",
+                        text = stringResource(R.string.mode_staff),
                         color = if (isStaff) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
@@ -234,15 +237,24 @@ fun LoginArenaContent(
                         isError = isError && email.isBlank(),
                         label = {
                             Text(
-                                "EMAIL",
+                                stringResource(R.string.label_email),
                                 fontFamily = FontFamily.Monospace,
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.Bold
                             )
                         },
-                        placeholder = { Text("athlete@arena.com", color = Color.Gray) },
+                        placeholder = { Text(stringResource(R.string.placeholder_email), color = Color.Gray) },
                         shape = RoundedCornerShape(8.dp),
-                        colors = outlinedTextFieldColorsCustom(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = ArenaUnfocusedBorder,
+                            focusedLabelColor = MaterialTheme.colorScheme.primary,
+                            unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                            unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                            focusedContainerColor = MaterialTheme.colorScheme.surface,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surface
+                        ),
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 16.dp),
@@ -256,7 +268,7 @@ fun LoginArenaContent(
                         isError = isError && password.isBlank(),
                         label = {
                             Text(
-                                "PASSWORD",
+                                stringResource(R.string.label_password),
                                 fontFamily = FontFamily.Monospace,
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.Bold
@@ -267,12 +279,21 @@ fun LoginArenaContent(
                             IconButton(onClick = { passwordVisible = !passwordVisible }) {
                                 Icon(
                                     imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                                    contentDescription = if (passwordVisible) "Hide password" else "Show password"
+                                    contentDescription = if (passwordVisible) stringResource(R.string.description_hide_password) else stringResource(R.string.description_show_password)
                                 )
                             }
                         },
                         shape = RoundedCornerShape(8.dp),
-                        colors = outlinedTextFieldColorsCustom(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = ArenaUnfocusedBorder,
+                            focusedLabelColor = MaterialTheme.colorScheme.primary,
+                            unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                            unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                            focusedContainerColor = MaterialTheme.colorScheme.surface,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surface
+                        ),
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 16.dp),
@@ -305,17 +326,17 @@ fun LoginArenaContent(
                                 )
                             )
                             Text(
-                                "Remember me",
+                                stringResource(R.string.remember_me),
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 fontSize = 12.sp
                             )
                         }
                         Text(
-                            text = "Forgot Password?",
+                            text = stringResource(R.string.forgot_password),
                             color = MaterialTheme.colorScheme.primary,
                             fontSize = 12.sp,
                             modifier = Modifier
-                                .clickable { makeText(context, "Forgot Password", Toast.LENGTH_SHORT).show()}
+                                .clickable { }
                                 .padding(4.dp)
                         )
                     }
@@ -323,16 +344,7 @@ fun LoginArenaContent(
                     Spacer(modifier = Modifier.height(24.dp))
 
                     if (uiState is LoginState.Loading) {
-                        Box(
-                            modifier = Modifier.fillMaxWidth()
-                                .padding(vertical = 16.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator(
-                                color = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(36.dp)
-                            )
-                        }
+                        LoadingIndicator()
                     } else {
                         Button(
                             onClick = {
@@ -347,16 +359,18 @@ fun LoginArenaContent(
                                 .fillMaxWidth()
                                 .height(50.dp)
                         ) {
-                            Text("LOGIN", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                            Text(stringResource(R.string.btn_login), fontWeight = FontWeight.Bold, fontSize = 14.sp)
                         }
                     }
                 }
 
+                val dontHaveAccountStr = stringResource(R.string.dont_have_account)
+                val registerStr = stringResource(R.string.Register)
                 val registerText = buildAnnotatedString {
                     withStyle(style = MaterialTheme.typography.bodyMedium.toSpanStyle().copy(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )) {
-                        append("Don't have an account? ")
+                        append(dontHaveAccountStr)
                     }
                     pushStringAnnotation(tag = "register", annotation = "register")
                     withStyle(
@@ -366,7 +380,7 @@ fun LoginArenaContent(
                                 fontWeight = FontWeight.Bold
                             )
                     ) {
-                        append("Register")
+                        append(registerStr)
                     }
                     pop()
                 }
@@ -383,9 +397,7 @@ fun LoginArenaContent(
                     onClick = { offset ->
                         registerText.getStringAnnotations(tag = "register", start = offset, end = offset)
                             .firstOrNull()?.let {
-                                makeText(context, "Accediendo al registro...", Toast.LENGTH_SHORT).show()
-                                // Aquí puedes añadir la navegación real, por ejemplo:
-                                // navController.navigate("register_screen")
+                                navController.navigate(Screen.Register.route)
                             }
                     }
                 )
@@ -409,12 +421,12 @@ fun LoginArenaContent(
                         Icon(
                             imageVector = Icons.Default.Warning,
                             contentDescription = null,
-                            tint = Color(0xFFEF4444),
+                            tint = ArenaWarning,
                             modifier = Modifier.size(16.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Restricted access area. Valid clearance required.",
+                            text = stringResource(R.string.staff_restricted_access),
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontSize = 11.sp
                         )
@@ -428,15 +440,24 @@ fun LoginArenaContent(
                         isError = isError && clearanceId.isBlank(),
                         label = {
                             Text(
-                                "CLEARANCE ID / EMAIL",
+                                stringResource(R.string.label_clearance_id),
                                 fontFamily = FontFamily.Monospace,
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.Bold
                             )
                         },
-                        placeholder = { Text("STAFF-ID-001", color = Color.Gray) },
+                        placeholder = { Text(stringResource(R.string.placeholder_staff_id), color = Color.Gray) },
                         shape = RoundedCornerShape(8.dp),
-                        colors = outlinedTextFieldColorsCustom(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = ArenaUnfocusedBorder,
+                            focusedLabelColor = MaterialTheme.colorScheme.primary,
+                            unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                            unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                            focusedContainerColor = MaterialTheme.colorScheme.surface,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surface
+                        ),
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 16.dp),
@@ -449,7 +470,7 @@ fun LoginArenaContent(
                         isError = isError && accessCode.isBlank(),
                         label = {
                             Text(
-                                "ACCESS CODE",
+                                stringResource(R.string.label_access_code),
                                 fontFamily = FontFamily.Monospace,
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.Bold
@@ -460,12 +481,21 @@ fun LoginArenaContent(
                             IconButton(onClick = { accessCodeVisible = !accessCodeVisible }) {
                                 Icon(
                                     imageVector = if (accessCodeVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                                    contentDescription = if (accessCodeVisible) "Hide password" else "Show password"
+                                    contentDescription = if (accessCodeVisible) stringResource(R.string.description_hide_password) else stringResource(R.string.description_show_password)
                                 )
                             }
                         },
                         shape = RoundedCornerShape(8.dp),
-                        colors = outlinedTextFieldColorsCustom(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = ArenaUnfocusedBorder,
+                            focusedLabelColor = MaterialTheme.colorScheme.primary,
+                            unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                            unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                            focusedContainerColor = MaterialTheme.colorScheme.surface,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surface
+                        ),
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 16.dp),
@@ -483,7 +513,7 @@ fun LoginArenaContent(
                     }
 
                     Text(
-                        text = "Request Access Reset",
+                        text = stringResource(R.string.request_access_reset),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontSize = 12.sp,
                         textAlign = TextAlign.End,
@@ -495,10 +525,7 @@ fun LoginArenaContent(
                     Spacer(modifier = Modifier.height(24.dp))
 
                     if (uiState is LoginState.Loading) {
-                        CircularProgressIndicator(
-                            color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(8.dp)
-                        )
+                        LoadingIndicator()
                     } else {
                         OutlinedButton(
                             onClick = { onLogin(clearanceId, accessCode) },
@@ -509,7 +536,7 @@ fun LoginArenaContent(
                                 .fillMaxWidth()
                                 .height(50.dp)
                         ) {
-                            Text("AUTHENTICATE", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                            Text(stringResource(R.string.btn_authenticate), fontWeight = FontWeight.Bold, fontSize = 14.sp)
                         }
                     }
                 }
@@ -519,16 +546,19 @@ fun LoginArenaContent(
 }
 
 @Composable
-fun outlinedTextFieldColorsCustom() = OutlinedTextFieldDefaults.colors(
-    focusedBorderColor = MaterialTheme.colorScheme.primary,
-    unfocusedBorderColor = Color(0xFF2D2D30),
-    focusedLabelColor = MaterialTheme.colorScheme.primary,
-    unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
-    focusedTextColor = MaterialTheme.colorScheme.onSurface,
-    unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
-    focusedContainerColor = MaterialTheme.colorScheme.surface,
-    unfocusedContainerColor = MaterialTheme.colorScheme.surface
-)
+fun LoadingIndicator() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 16.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator(
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(36.dp)
+        )
+    }
+}
 
 @Preview(showBackground = true, name = "Arena Login Completo")
 @Composable

@@ -1,4 +1,4 @@
-package com.example.arena.ViewModel
+package com.example.arena.navigation
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -7,11 +7,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.arena.Model.Di.Daos.UserDao
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jakarta.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-
+import javax.inject.Inject
 
 @HiltViewModel
 class NavigationViewModel @Inject constructor(private val userDao: UserDao) : ViewModel() {

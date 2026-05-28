@@ -7,7 +7,8 @@ import com.example.arena.Model.Di.Domain.UserMapper
 fun UserEntity.ToDomain(): UserMapper{
     return UserMapper(
         id = this.uid,
-        email = this.email,
+        email = this.email ?: "",
+        lastName= this.lastName,
         name = this.name,
         role = this.role
     )
@@ -20,7 +21,8 @@ fun UserMapper.ToEntity(isRemebered: Boolean): UserEntity{
         uid = this.id,
         email = this.email,
         name = this.name,
-        role= this.role,
+        lastName = this.lastName,
+        role = this.role,
         isRemenbered = isRemebered
     )
 }

@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 
 private val ArenaColorScheme = darkColorScheme(
+
     background = ArenaBackground,
     surface = ArenaSurfaceBase,
     surfaceVariant = ArenaSurfaceElevated,
@@ -18,7 +19,8 @@ private val ArenaColorScheme = darkColorScheme(
     onPrimary = ArenaOnPrimaryFixed,
     onSurface = ArenaTextPrimary,
     onSurfaceVariant = ArenaTextVariant,
-    error = ArenaErrorContainer
+    error = ArenaErrorContainer,
+
 )
 
 @Composable

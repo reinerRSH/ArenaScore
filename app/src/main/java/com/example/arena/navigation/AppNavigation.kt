@@ -5,8 +5,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.arena.View.ui.login.LoginArenaScreen
-import com.example.arena.ViewModel.LoginViewModel
+import com.example.arena.ui.auth.login.LoginArenaScreen
+import com.example.arena.ui.auth.login.LoginViewModel
+import com.example.arena.ui.auth.register.RegisterArenaScreen
+import com.example.arena.ui.auth.register.RegisterViewModel
 
 @Composable
 fun AppNavigation(){
@@ -25,6 +27,11 @@ fun AppNavigation(){
 
 
             LoginArenaScreen(navController = navController, viewModel = viewModel)
+        }
+
+        composable(route = Screen.Register.route){
+            val viewModel: RegisterViewModel = hiltViewModel()
+            RegisterArenaScreen(navController = navController, viewModel = viewModel)
         }
 
 

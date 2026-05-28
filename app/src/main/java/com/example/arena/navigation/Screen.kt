@@ -10,5 +10,6 @@ import androidx.navigation.compose.composable
 sealed class Screen (val route: String){
 
     object Login : Screen("login_Screen")
+    object Register : Screen("register_Screen")
     object Home : Screen("home_Screen")
 }
