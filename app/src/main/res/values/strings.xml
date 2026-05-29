@@ -31,6 +31,8 @@
 
     <string name="campo_vacio">Los campos no pueden estar vacíos</string>
     <string name="autenticacion_fallida">Autenticación Fallida</string>
+    <string name="all_fields_required">Requiere llenar todos los campos</string>
+    <string name="password_too_short">la contraseña debe ser mayor de 6 caracteres</string>
 
     <string name="registration_successful">Registration Successful!</string>
     <string name="passwords_do_not_match">Passwords do not match.</string>
@@ -49,4 +51,5 @@
     <string name="continue_with_google">Continue with Google</string>
     <string name="already_have_account">Already have an account? </string>
     <string name="login_action">Login</string>
+    <string name="login_success">Bienvenido de nuevo!</string>
 </resources>

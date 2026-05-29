@@ -9,6 +9,8 @@ import com.example.arena.ui.auth.login.LoginArenaScreen
 import com.example.arena.ui.auth.login.LoginViewModel
 import com.example.arena.ui.auth.register.RegisterArenaScreen
 import com.example.arena.ui.auth.register.RegisterViewModel
+import com.example.arena.ui.home.HomeArenaScreen
+import com.example.arena.ui.home.HomeArenaScreen
 
 @Composable
 fun AppNavigation(){
@@ -34,8 +36,8 @@ fun AppNavigation(){
             RegisterArenaScreen(navController = navController, viewModel = viewModel)
         }
 
-
-
-
+        composable(route = Screen.Home.route){
+            HomeArenaScreen()
+        }
     }
 }

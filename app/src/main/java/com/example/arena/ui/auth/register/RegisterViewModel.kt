@@ -25,46 +25,39 @@ class RegisterViewModel @Inject constructor(
 ) : ViewModel() {
 
 
-    var uiState: RegisterState by mutableStateOf(RegisterState.idle)
+    var uiState: RegisterState by mutableStateOf<RegisterState>(RegisterState.idle)
         private set
 
 
     fun registerUsuario(name: String, lastName: String, email: String, password: String) {
-        var uiState = when {
+        val validationState = when {
             name.isBlank() || email.isBlank() || password.isBlank() -> {
                 RegisterState.Error("Los campos no pueden estar vacios")
             }
-
 
             password.length < 6 -> {
                 RegisterState.Error("La contraseña debe tener al menos 6 caracteres")
             }
 
-            else -> {
-                RegisterState.loading
-            }
+            else -> null
         }
 
-        if (uiState is RegisterState.Error) return
+        if (validationState != null) {
+            uiState = validationState
+            return
+        }
 
-
-
+        uiState = RegisterState.loading
 
         viewModelScope.launch {
-
             try {
                 delay(2000)
                 val authResult = auth.createUserWithEmailAndPassword(email, password).await()
                 val uid =
                     authResult.user?.uid ?: throw Exception("incapaz de obtener el UID del Usuario")
-                val profileUpdate = userProfileChangeRequest {
-                    displayName = name
-
-
-                }
-
+                
                 val fullName = "$name $lastName".trim()
-                val profileUpdates = userProfileChangeRequest {
+                val profileUpdate = userProfileChangeRequest {
                     displayName = fullName
                 }
 
@@ -76,7 +69,7 @@ class RegisterViewModel @Inject constructor(
                         name = name,
                         lastName = lastName,
                         email = email,
-                        role = "",
+                        role = "ATHLETE",
                         isRemenbered = true
                     )
 
@@ -84,11 +77,9 @@ class RegisterViewModel @Inject constructor(
                 }
                 uiState = RegisterState.success
             } catch (e: Exception) {
-                uiState = RegisterState.Error(e.message ?: "Registro fallido")
+                uiState = RegisterState.Error(e.localizedMessage ?: "Registro fallido")
             }
         }
-
-
     }
 
     fun registerWithGoogle(idToken: String) {
@@ -96,6 +87,7 @@ class RegisterViewModel @Inject constructor(
 
         viewModelScope.launch {
             try {
+                delay(2000)
                 val credential = GoogleAuthProvider.getCredential(idToken, null)
                 val authResult = auth.signInWithCredential(credential).await()
                 val firebaseUser =
@@ -113,7 +105,7 @@ class RegisterViewModel @Inject constructor(
                         name = firstName.uppercase(),
                         lastName = lastName.uppercase(),
                         email = firebaseUser.email,
-                        role = " ",
+                        role = "ATHLETE",
                         isRemenbered = true
                         )
 
@@ -124,7 +116,7 @@ class RegisterViewModel @Inject constructor(
 
 
             } catch (e: Exception) {
-
+                uiState = RegisterState.Error(e.localizedMessage ?: "Error en la autenticación con Google")
             }
         }
 

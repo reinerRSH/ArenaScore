@@ -1,6 +1,5 @@
 package com.example.arena.ui.auth.register
 
-import android.R.attr.contentDescription
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -39,7 +38,7 @@ import com.example.arena.View.ui.theme.*
 import com.example.arena.LoginMode
 import com.example.arena.navigation.Screen
 import com.example.arena.R
-import com.google.firebase.firestore.pipeline.Expression.Companion.isError
+import kotlinx.coroutines.launch
 
 @Composable
 fun RegisterArenaScreen(
@@ -48,12 +47,15 @@ fun RegisterArenaScreen(
 ) {
     val context = LocalContext.current
     val uiState = viewModel.uiState
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(uiState) {
         when (uiState) {
             is RegisterState.success -> {
                 Toast.makeText(context, context.getString(R.string.registration_successful), Toast.LENGTH_SHORT).show()
-                navController.navigate(Screen.Login.route)
+                navController.navigate(Screen.Home.route) {
+                    popUpTo(Screen.Register.route) { inclusive = true }
+                }
             }
             is RegisterState.Error -> {
                 Toast.makeText(context, uiState.message, Toast.LENGTH_SHORT).show()
@@ -80,10 +82,42 @@ fun RegisterArenaScreen(
         RegisterArenaContent(
             uiState = uiState,
             onRegister = { firstName, lastName, email, password, confirmPassword ->
-                if (password != confirmPassword) {
-                    Toast.makeText(context, context.getString(R.string.passwords_do_not_match), Toast.LENGTH_SHORT).show()
+                // 🎯 VALIDACIÓN EN UNA SOLA LÍNEA (Cero ruido de IFs heredados)
+                val errorMsg = RegistrarValidator.validarFormulario(context, firstName, lastName, email, password, confirmPassword)
+
+                if (errorMsg != null) {
+                    Toast.makeText(context, errorMsg, Toast.LENGTH_SHORT).show()
                 } else {
                     viewModel.registerUsuario(firstName, lastName, email, password)
+                }
+            },
+            onRegisterGoogle = {
+                coroutineScope.launch {
+                    try {
+                        val credentialManager = androidx.credentials.CredentialManager.create(context)
+
+                        val googleIdOption = com.google.android.libraries.identity.googleid.GetGoogleIdOption.Builder()
+                            .setFilterByAuthorizedAccounts(false)
+                            .setServerClientId("999434492354-j22e5mba6c668cajqm8dtrfvd4c2864h.apps.googleusercontent.com")
+                            .setAutoSelectEnabled(false)
+                            .build()
+
+                        val getCredentialRequest = androidx.credentials.GetCredentialRequest.Builder()
+                            .addCredentialOption(googleIdOption)
+                            .build()
+
+                        val result = credentialManager.getCredential(context, getCredentialRequest)
+                        val credential = result.credential
+
+                        if (credential is com.google.android.libraries.identity.googleid.GoogleIdTokenCredential) {
+                            val idToken = credential.idToken
+                            viewModel.registerWithGoogle(idToken)
+                        } else {
+                            Toast.makeText(context, "No se pudo obtener una credencial válida de Google", Toast.LENGTH_SHORT).show()
+                        }
+                    } catch (e: Exception) {
+                        Toast.makeText(context, "Google Sign-In failed: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+                    }
                 }
             },
             onBackToLogin = { navController.popBackStack() }
@@ -95,6 +129,7 @@ fun RegisterArenaScreen(
 fun RegisterArenaContent(
     uiState: RegisterState,
     onRegister: (String, String, String, String, String) -> Unit,
+    onRegisterGoogle: () -> Unit,
     onBackToLogin: () -> Unit
 ) {
     val scrollState = rememberScrollState()
@@ -251,9 +286,9 @@ fun RegisterArenaContent(
             Spacer(modifier = Modifier.height(12.dp))
 
             OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
-                isError = isError && password.isBlank(),
+                value = confirmPassword,
+                onValueChange = { confirmPassword = it },
+                isError = isError && confirmPassword.isBlank(),
                 label = { Text(stringResource(R.string.label_Confirmpassword), fontSize = 10.sp, color = ArenaTextVariant) },
                 visualTransformation = if(passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 trailingIcon = {
@@ -295,20 +330,32 @@ fun RegisterArenaContent(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            if (uiState is RegisterState.loading) {
-                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = PrimaryNeon)
-                }
-            } else {
-                Button(
-                    onClick = { onRegister(firstName, lastName, email, password, confirmPassword) },
-                    shape = RoundedCornerShape(2.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryNeon),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp)
-                ) {
-                    Text(text = stringResource(R.string.btn_register), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = ArenaOnPrimaryFixed, letterSpacing = 2.sp)
+            Button(
+                onClick = { onRegister(firstName, lastName, email, password, confirmPassword) },
+                enabled = uiState !is RegisterState.loading,
+                shape = RoundedCornerShape(2.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = PrimaryNeon,
+                    disabledContainerColor = PrimaryNeon.copy(alpha = 0.5f)
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+            ) {
+                if (uiState is RegisterState.loading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = ArenaOnPrimaryFixed,
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Text(
+                        text = stringResource(R.string.btn_register),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = ArenaOnPrimaryFixed,
+                        letterSpacing = 2.sp
+                    )
                 }
             }
 
@@ -326,7 +373,7 @@ fun RegisterArenaContent(
             Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedButton(
-                onClick = { /* TODO: Google Auth */ },
+                onClick = { onRegisterGoogle() },
                 shape = RoundedCornerShape(2.dp),
                 border = BorderStroke(1.dp, ArenaUnfocusedBorder),
                 colors = ButtonDefaults.outlinedButtonColors(containerColor = ArenaSurfaceElevated.copy(alpha = 0.6f)),
@@ -354,7 +401,6 @@ fun RegisterArenaContent(
             }
         }
         
-        // Espaciador extra al final para asegurar que el teclado no cubra nada
         Spacer(modifier = Modifier.height(40.dp))
     }
 }
@@ -372,6 +418,7 @@ fun RegisterArenaPreview() {
             RegisterArenaContent(
                 uiState = fakeUiState,
                 onRegister = { _, _, _, _, _ -> },
+                onRegisterGoogle = {},
                 onBackToLogin = {}
             )
         }

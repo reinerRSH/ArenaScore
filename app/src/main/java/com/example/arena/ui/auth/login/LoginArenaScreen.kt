@@ -76,6 +76,8 @@ import com.example.arena.View.ui.theme.EliteAthleteOSTheme
 import androidx.compose.ui.text.buildAnnotatedString
 import com.example.arena.navigation.Screen
 import com.example.arena.LoginMode
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -85,10 +87,12 @@ fun LoginArenaScreen(
 ) {
     val context = LocalContext.current
     val uiState = viewModel.uiState
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(uiState) {
         when (uiState) {
             is LoginState.Success -> {
+                makeText(context, context.getString(R.string.login_success), Toast.LENGTH_SHORT).show()
                 navController.navigate(Screen.Home.route) {
                     popUpTo(Screen.Login.route) {
                         this.inclusive = true
@@ -105,9 +109,37 @@ fun LoginArenaScreen(
     LoginArenaContent(
         uiState = uiState,
         navController = navController,
-        onLogin = { email, password ->
-            viewModel.loginUsuario(email, password, rememberMe = false)
+        onLogin = { email, password, rememberMe ->
+            viewModel.loginUsuario(email, password, rememberMe)
+        },
+        onLoginGoogle = {
+            coroutineScope.launch {
+                try {
+                    val credentialManager = androidx.credentials.CredentialManager.create(context)
 
+                    val googleIdOption = com.google.android.libraries.identity.googleid.GetGoogleIdOption.Builder()
+                        .setFilterByAuthorizedAccounts(false)
+                        .setServerClientId("999434492354-j22e5mba6c668cajqm8dtrfvd4c2864h.apps.googleusercontent.com")
+                        .setAutoSelectEnabled(false)
+                        .build()
+
+                    val getCredentialRequest = androidx.credentials.GetCredentialRequest.Builder()
+                        .addCredentialOption(googleIdOption)
+                        .build()
+
+                    val result = credentialManager.getCredential(context, getCredentialRequest)
+                    val credential = result.credential
+
+                    if (credential is com.google.android.libraries.identity.googleid.GoogleIdTokenCredential) {
+                        val idToken = credential.idToken
+                        viewModel.loginWithGoogle(idToken)
+                    } else {
+                        makeText(context, "No se pudo obtener una credencial válida de Google", Toast.LENGTH_SHORT).show()
+                    }
+                } catch (e: Exception) {
+                    makeText(context, "Google Sign-In failed: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     )
 }
@@ -115,7 +147,8 @@ fun LoginArenaScreen(
 @Composable
 fun LoginArenaContent(
     uiState: LoginState,
-    onLogin: (String, String) -> Unit,
+    onLogin: (String, String, Boolean) -> Unit,
+    onLoginGoogle: () -> Unit,
     navController: NavController
 ) {
     val context = LocalContext.current
@@ -348,7 +381,7 @@ fun LoginArenaContent(
                     } else {
                         Button(
                             onClick = {
-                                onLogin(email, password)
+                                onLogin(email, password, rememberMe)
                             },
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = MaterialTheme.colorScheme.primary,
@@ -360,6 +393,20 @@ fun LoginArenaContent(
                                 .height(50.dp)
                         ) {
                             Text(stringResource(R.string.btn_login), fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                        }
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        OutlinedButton(
+                            onClick = { onLoginGoogle() },
+                            shape = RoundedCornerShape(8.dp),
+                            border = BorderStroke(1.dp, ArenaUnfocusedBorder),
+                            colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.onSurface),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(50.dp)
+                        ) {
+                            Text(stringResource(R.string.continue_with_google), fontWeight = FontWeight.Bold, fontSize = 14.sp)
                         }
                     }
                 }
@@ -528,7 +575,7 @@ fun LoginArenaContent(
                         LoadingIndicator()
                     } else {
                         OutlinedButton(
-                            onClick = { onLogin(clearanceId, accessCode) },
+                            onClick = { onLogin(clearanceId, accessCode, false) },
                             border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
                             colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary),
                             shape = RoundedCornerShape(8.dp),
@@ -567,7 +614,8 @@ fun ArenaLoginPreview() {
         Surface(modifier = Modifier.fillMaxSize()) {
             LoginArenaContent(
                 uiState = LoginState.Idle,
-                onLogin = { _, _ -> },
+                onLogin = { _, _, _ -> },
+                onLoginGoogle = {},
                 navController = NavController(LocalContext.current)
             )
         }
