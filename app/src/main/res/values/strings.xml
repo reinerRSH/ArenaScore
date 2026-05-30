@@ -36,6 +36,7 @@
 
     <string name="registration_successful">Registration Successful!</string>
     <string name="passwords_do_not_match">Passwords do not match.</string>
+    <string name="invalid_email_domain">El correo debe tener un dominio .com (ejemplo: usuario@dominio.com)</string>
     <string name="join_the_arena">JOIN THE ARENA</string>
     <string name="institutional_performance_analytics">INSTITUTIONAL PERFORMANCE &amp; ANALYTICS</string>
     <string name="label_first_name">FIRST NAME</string>
@@ -43,7 +44,7 @@
     <string name="label_last_name">LAST NAME</string>
     <string name="placeholder_last_name">VON</string>
     <string name="label_email_address">EMAIL ADDRESS</string>
-    <string name="placeholder_email_register">ERIK.V@ARENA.SYSTEMS</string>
+    <string name="placeholder_email_register">usuario@ejemplo.com</string>
     <string name="label_security_credentials">SECURITY CREDENTIALS</string>
     <string name="label_confirm_credentials">CONFIRM CREDENTIALS</string>
     <string name="btn_register">REGISTER</string>

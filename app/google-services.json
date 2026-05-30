@@ -14,14 +14,6 @@
       },
       "oauth_client": [
         {
-          "client_id": "999434492354-2n8tcahr7tbsck3g23505ndhgl0q9gfm.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.arena",
-            "certificate_hash": "80cd077a74a172890ebd9467a4141c7c363fe17b"
-          }
-        },
-        {
           "client_id": "999434492354-j22e5mba6c668cajqm8dtrfvd4c2864h.apps.googleusercontent.com",
           "client_type": 3
         }

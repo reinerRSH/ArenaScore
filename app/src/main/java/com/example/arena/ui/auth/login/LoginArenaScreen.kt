@@ -123,16 +123,29 @@ fun LoginArenaScreen(
                         .setAutoSelectEnabled(false)
                         .build()
 
-                    val getCredentialRequest = androidx.credentials.GetCredentialRequest.Builder()
+                    val getCredentialRequest =
+                        androidx.credentials.GetCredentialRequest.Builder()
                         .addCredentialOption(googleIdOption)
                         .build()
 
                     val result = credentialManager.getCredential(context, getCredentialRequest)
                     val credential = result.credential
 
-                    if (credential is com.google.android.libraries.identity.googleid.GoogleIdTokenCredential) {
-                        val idToken = credential.idToken
-                        viewModel.loginWithGoogle(idToken)
+                    if (credential is androidx.credentials.CustomCredential && credential.type ==
+                        com.google.android.libraries.identity.googleid.GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
+                        ) {
+                        try {
+                            val googleIdTokenCredential =
+                                com.google.android.libraries.identity.googleid.GoogleIdTokenCredential.createFrom(credential.data)
+                            val idToken = googleIdTokenCredential.idToken
+                            viewModel.loginWithGoogle(idToken)
+
+                        }catch (e: Exception){
+                            Toast.makeText(
+                                context,
+                                "Google Sign-In failed: ${e.localizedMessage}",
+                                Toast.LENGTH_SHORT).show()
+                        }
                     } else {
                         makeText(context, "No se pudo obtener una credencial válida de Google", Toast.LENGTH_SHORT).show()
                     }

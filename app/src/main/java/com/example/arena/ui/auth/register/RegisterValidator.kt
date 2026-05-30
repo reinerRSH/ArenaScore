@@ -23,7 +23,15 @@ object RegistrarValidator {
             password != confirmPassword ->
                 context.getString(R.string.passwords_do_not_match)
 
+            !isValidEmail(email) ->
+                context.getString(R.string.invalid_email_domain)
+
             else -> null
         }
+    }
+
+    private fun isValidEmail(email: String): Boolean {
+        val emailRegex = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.com$".toRegex()
+        return emailRegex.matches(email)
     }
 }

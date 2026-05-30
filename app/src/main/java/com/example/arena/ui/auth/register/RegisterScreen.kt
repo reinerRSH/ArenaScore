@@ -52,14 +52,20 @@ fun RegisterArenaScreen(
     LaunchedEffect(uiState) {
         when (uiState) {
             is RegisterState.success -> {
-                Toast.makeText(context, context.getString(R.string.registration_successful), Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.registration_successful),
+                    Toast.LENGTH_SHORT
+                ).show()
                 navController.navigate(Screen.Home.route) {
                     popUpTo(Screen.Register.route) { inclusive = true }
                 }
             }
+
             is RegisterState.Error -> {
                 Toast.makeText(context, uiState.message, Toast.LENGTH_SHORT).show()
             }
+
             else -> {}
         }
     }
@@ -83,7 +89,14 @@ fun RegisterArenaScreen(
             uiState = uiState,
             onRegister = { firstName, lastName, email, password, confirmPassword ->
                 // 🎯 VALIDACIÓN EN UNA SOLA LÍNEA (Cero ruido de IFs heredados)
-                val errorMsg = RegistrarValidator.validarFormulario(context, firstName, lastName, email, password, confirmPassword)
+                val errorMsg = RegistrarValidator.validarFormulario(
+                    context,
+                    firstName,
+                    lastName,
+                    email,
+                    password,
+                    confirmPassword
+                )
 
                 if (errorMsg != null) {
                     Toast.makeText(context, errorMsg, Toast.LENGTH_SHORT).show()
@@ -94,29 +107,54 @@ fun RegisterArenaScreen(
             onRegisterGoogle = {
                 coroutineScope.launch {
                     try {
-                        val credentialManager = androidx.credentials.CredentialManager.create(context)
+                        val credentialManager =
+                            androidx.credentials.CredentialManager.create(context)
 
-                        val googleIdOption = com.google.android.libraries.identity.googleid.GetGoogleIdOption.Builder()
-                            .setFilterByAuthorizedAccounts(false)
-                            .setServerClientId("999434492354-j22e5mba6c668cajqm8dtrfvd4c2864h.apps.googleusercontent.com")
-                            .setAutoSelectEnabled(false)
-                            .build()
+                        val googleIdOption =
+                            com.google.android.libraries.identity.googleid.GetGoogleIdOption.Builder()
+                                .setFilterByAuthorizedAccounts(false)
+                                .setServerClientId("999434492354-j22e5mba6c668cajqm8dtrfvd4c2864h.apps.googleusercontent.com")
+                                .setAutoSelectEnabled(false)
+                                .build()
 
-                        val getCredentialRequest = androidx.credentials.GetCredentialRequest.Builder()
-                            .addCredentialOption(googleIdOption)
-                            .build()
+                        val getCredentialRequest =
+                            androidx.credentials.GetCredentialRequest.Builder()
+                                .addCredentialOption(googleIdOption)
+                                .build()
 
                         val result = credentialManager.getCredential(context, getCredentialRequest)
                         val credential = result.credential
 
-                        if (credential is com.google.android.libraries.identity.googleid.GoogleIdTokenCredential) {
-                            val idToken = credential.idToken
-                            viewModel.registerWithGoogle(idToken)
+                        if (credential is androidx.credentials.CustomCredential &&
+                            credential.type == com.google.android.libraries.identity.googleid.GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
+                        ) {
+                            try {
+                                val googleIdTokenCredential =
+                                    com.google.android.libraries.identity.googleid.GoogleIdTokenCredential.createFrom(
+                                        credential.data
+                                    )
+                                val idToken = googleIdTokenCredential.idToken
+                                viewModel.registerWithGoogle(idToken)
+
+                            } catch (e: Exception) {
+                                Toast.makeText(
+                                    context,
+                                    "Google Sign-In failed: ${e.localizedMessage}",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
                         } else {
-                            Toast.makeText(context, "No se pudo obtener una credencial válida de Google", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                context, "El formato de la credencial no es valido",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     } catch (e: Exception) {
-                        Toast.makeText(context, "Google Sign-In failed: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            context,
+                            "Google Sign-In failed: ${e.localizedMessage}",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
             },
@@ -154,7 +192,7 @@ fun RegisterArenaContent(
         verticalArrangement = Arrangement.Top // Cambiado a Top para mejor comportamiento con scroll
     ) {
         Spacer(modifier = Modifier.height(20.dp))
-        
+
         // --- HEADER SECTION ---
         Text(
             text = stringResource(R.string.join_the_arena),
@@ -193,8 +231,19 @@ fun RegisterArenaContent(
                 OutlinedTextField(
                     value = firstName,
                     onValueChange = { firstName = it.uppercase() },
-                    label = { Text(stringResource(R.string.label_first_name), fontSize = 10.sp, color = ArenaTextVariant) },
-                    placeholder = { Text(stringResource(R.string.placeholder_first_name), color = ArenaTextVariant.copy(alpha = 0.5f)) },
+                    label = {
+                        Text(
+                            stringResource(R.string.label_first_name),
+                            fontSize = 10.sp,
+                            color = ArenaTextVariant
+                        )
+                    },
+                    placeholder = {
+                        Text(
+                            stringResource(R.string.placeholder_first_name),
+                            color = ArenaTextVariant.copy(alpha = 0.5f)
+                        )
+                    },
                     singleLine = true,
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = PrimaryNeon,
@@ -208,8 +257,19 @@ fun RegisterArenaContent(
                 OutlinedTextField(
                     value = lastName,
                     onValueChange = { lastName = it.uppercase() },
-                    label = { Text(stringResource(R.string.label_last_name), fontSize = 10.sp, color = ArenaTextVariant) },
-                    placeholder = { Text(stringResource(R.string.placeholder_last_name), color = ArenaTextVariant.copy(alpha = 0.5f)) },
+                    label = {
+                        Text(
+                            stringResource(R.string.label_last_name),
+                            fontSize = 10.sp,
+                            color = ArenaTextVariant
+                        )
+                    },
+                    placeholder = {
+                        Text(
+                            stringResource(R.string.placeholder_last_name),
+                            color = ArenaTextVariant.copy(alpha = 0.5f)
+                        )
+                    },
                     singleLine = true,
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = PrimaryNeon,
@@ -226,17 +286,40 @@ fun RegisterArenaContent(
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text(stringResource(R.string.label_email_address), fontSize = 10.sp, color = ArenaTextVariant) },
-                placeholder = { Text(stringResource(R.string.placeholder_email_register), color = ArenaTextVariant.copy(alpha = 0.5f)) },
+                isError = isError && email.isNotEmpty() && !email.endsWith(".com"),
+                label = {
+                    Text(
+                        stringResource(R.string.label_email_address),
+                        fontSize = 10.sp,
+                        color = ArenaTextVariant
+                    )
+                },
+                placeholder = {
+                    Text(
+                        stringResource(R.string.placeholder_email_register),
+                        color = ArenaTextVariant.copy(alpha = 0.5f)
+                    )
+                },
                 singleLine = true,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = PrimaryNeon,
                     unfocusedBorderColor = ArenaUnfocusedBorder,
                     focusedContainerColor = ArenaSurfaceBase,
-                    unfocusedContainerColor = ArenaSurfaceBase
+                    unfocusedContainerColor = ArenaSurfaceBase,
+                    errorBorderColor = Color.Red
                 ),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 modifier = Modifier.fillMaxWidth()
             )
+
+            if (isError && email.isNotEmpty() && !email.endsWith(".com")) {
+                Text(
+                    text = stringResource(R.string.invalid_email_domain),
+                    color = MaterialTheme.colorScheme.error,
+                    fontSize = 12.sp,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+            }
 
             Spacer(modifier = Modifier.height(12.dp))
 
@@ -244,8 +327,14 @@ fun RegisterArenaContent(
                 value = password,
                 onValueChange = { password = it },
                 isError = isError && password.isBlank(),
-                label = { Text(stringResource(R.string.label_password), fontSize = 10.sp, color = ArenaTextVariant) },
-                visualTransformation = if(passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                label = {
+                    Text(
+                        stringResource(R.string.label_password),
+                        fontSize = 10.sp,
+                        color = ArenaTextVariant
+                    )
+                },
+                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 trailingIcon = {
                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
                         Icon(
@@ -289,8 +378,14 @@ fun RegisterArenaContent(
                 value = confirmPassword,
                 onValueChange = { confirmPassword = it },
                 isError = isError && confirmPassword.isBlank(),
-                label = { Text(stringResource(R.string.label_Confirmpassword), fontSize = 10.sp, color = ArenaTextVariant) },
-                visualTransformation = if(passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                label = {
+                    Text(
+                        stringResource(R.string.label_Confirmpassword),
+                        fontSize = 10.sp,
+                        color = ArenaTextVariant
+                    )
+                },
+                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 trailingIcon = {
                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
                         Icon(
@@ -365,9 +460,20 @@ fun RegisterArenaContent(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                HorizontalDivider(modifier = Modifier.weight(1f), color = ArenaStaffBorder.copy(alpha = 0.5f))
-                Text(text = stringResource(R.string.or_continue_with), fontSize = 9.sp, color = ArenaTextVariant.copy(alpha = 0.6f), modifier = Modifier.padding(horizontal = 8.dp))
-                HorizontalDivider(modifier = Modifier.weight(1f), color = ArenaStaffBorder.copy(alpha = 0.5f))
+                HorizontalDivider(
+                    modifier = Modifier.weight(1f),
+                    color = ArenaStaffBorder.copy(alpha = 0.5f)
+                )
+                Text(
+                    text = stringResource(R.string.or_continue_with),
+                    fontSize = 9.sp,
+                    color = ArenaTextVariant.copy(alpha = 0.6f),
+                    modifier = Modifier.padding(horizontal = 8.dp)
+                )
+                HorizontalDivider(
+                    modifier = Modifier.weight(1f),
+                    color = ArenaStaffBorder.copy(alpha = 0.5f)
+                )
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -376,12 +482,20 @@ fun RegisterArenaContent(
                 onClick = { onRegisterGoogle() },
                 shape = RoundedCornerShape(2.dp),
                 border = BorderStroke(1.dp, ArenaUnfocusedBorder),
-                colors = ButtonDefaults.outlinedButtonColors(containerColor = ArenaSurfaceElevated.copy(alpha = 0.6f)),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    containerColor = ArenaSurfaceElevated.copy(
+                        alpha = 0.6f
+                    )
+                ),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(44.dp)
             ) {
-                Text(text = stringResource(R.string.continue_with_google), color = ArenaTextPrimary, fontSize = 14.sp)
+                Text(
+                    text = stringResource(R.string.continue_with_google),
+                    color = ArenaTextPrimary,
+                    fontSize = 14.sp
+                )
             }
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -390,7 +504,11 @@ fun RegisterArenaContent(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
             ) {
-                Text(text = stringResource(R.string.already_have_account), fontSize = 12.sp, color = ArenaTextVariant)
+                Text(
+                    text = stringResource(R.string.already_have_account),
+                    fontSize = 12.sp,
+                    color = ArenaTextVariant
+                )
                 Text(
                     text = stringResource(R.string.login_action),
                     fontSize = 12.sp,
@@ -400,7 +518,7 @@ fun RegisterArenaContent(
                 )
             }
         }
-        
+
         Spacer(modifier = Modifier.height(40.dp))
     }
 }
