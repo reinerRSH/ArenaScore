@@ -9,9 +9,9 @@
               <option name="connection">
                 <ConnectionSetting>
                   <option name="appId" value="com.example.arena" />
-                  <option name="mobileSdkAppId" value="1:999434492354:android:65546b4dc463bed0fb9e5b" />
-                  <option name="projectId" value="arena-score" />
-                  <option name="projectNumber" value="999434492354" />
+                  <option name="mobileSdkAppId" value="1:87579931946:android:a526e684fdbcfc4985da53" />
+                  <option name="projectId" value="arena-score-ded96" />
+                  <option name="projectNumber" value="87579931946" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

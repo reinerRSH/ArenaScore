@@ -28,11 +28,15 @@ class RegisterViewModel @Inject constructor(
     var uiState: RegisterState by mutableStateOf<RegisterState>(RegisterState.idle)
         private set
 
+    fun setError(message: String) {
+        uiState = RegisterState.Error(message)
+    }
+
 
     fun registerUsuario(name: String, lastName: String, email: String, password: String) {
         val validationState = when {
             name.isBlank() || email.isBlank() || password.isBlank() -> {
-                RegisterState.Error("Los campos no pueden estar vacios")
+                RegisterState.Error("Los campos no pueden estar vacíos")
             }
 
             password.length < 6 -> {
@@ -54,7 +58,7 @@ class RegisterViewModel @Inject constructor(
                 delay(2000)
                 val authResult = auth.createUserWithEmailAndPassword(email, password).await()
                 val uid =
-                    authResult.user?.uid ?: throw Exception("incapaz de obtener el UID del Usuario")
+                    authResult.user?.uid ?: throw Exception("Incapaz de obtener el UID del usuario")
                 
                 val fullName = "$name $lastName".trim()
                 val profileUpdate = userProfileChangeRequest {
@@ -91,9 +95,9 @@ class RegisterViewModel @Inject constructor(
                 val credential = GoogleAuthProvider.getCredential(idToken, null)
                 val authResult = auth.signInWithCredential(credential).await()
                 val firebaseUser =
-                    authResult.user ?: throw Exception("Google Auth failed to return a valid user.")
+                    authResult.user ?: throw Exception("La autenticación de Google no devolvió un usuario válido.")
 
-                val displayName = firebaseUser.displayName ?: "Arena Athlete"
+                val displayName = firebaseUser.displayName ?: "Atleta de Arena"
                 val nameParts = displayName.split(" ", limit = 2)
                 val firstName = nameParts.getOrNull(0) ?: displayName
                 val lastName = nameParts.getOrNull(1) ?: ""

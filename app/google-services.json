@@ -1,33 +1,41 @@
 {
   "project_info": {
-    "project_number": "999434492354",
-    "project_id": "arena-score",
-    "storage_bucket": "arena-score.firebasestorage.app"
+    "project_number": "87579931946",
+    "project_id": "arena-score-ded96",
+    "storage_bucket": "arena-score-ded96.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:999434492354:android:65546b4dc463bed0fb9e5b",
+        "mobilesdk_app_id": "1:87579931946:android:a526e684fdbcfc4985da53",
         "android_client_info": {
           "package_name": "com.example.arena"
         }
       },
       "oauth_client": [
         {
-          "client_id": "999434492354-j22e5mba6c668cajqm8dtrfvd4c2864h.apps.googleusercontent.com",
+          "client_id": "87579931946-bi5pkh89qubnbu4htp8apmtplurmku3e.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.arena",
+            "certificate_hash": "80cd077a74a172890ebd9467a4141c7c363fe17b"
+          }
+        },
+        {
+          "client_id": "87579931946-tr0gevk4piu4iup332f6b42dpnda1gb3.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBKBkrLLo7zgkmDtQAHPrLaeZZFlz-93h4"
+          "current_key": "AIzaSyBQoeEtyJkka9D6c22lxmusSZTS8_ikCXI"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "999434492354-j22e5mba6c668cajqm8dtrfvd4c2864h.apps.googleusercontent.com",
+              "client_id": "87579931946-tr0gevk4piu4iup332f6b42dpnda1gb3.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

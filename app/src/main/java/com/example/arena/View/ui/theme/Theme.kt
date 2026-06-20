@@ -16,6 +16,7 @@ private val ArenaColorScheme = darkColorScheme(
     surface = ArenaSurfaceBase,
     surfaceVariant = ArenaSurfaceElevated,
     primary = ArenaPrimaryContainer,
+    secondary = ArenaMagenta,
     onPrimary = ArenaOnPrimaryFixed,
     onSurface = ArenaTextPrimary,
     onSurfaceVariant = ArenaTextVariant,

@@ -1,56 +1,101 @@
 <resources>
     <string name="app_name">Arena</string>
     <string name="titulo_app">ARENA</string>
-    <string name="command_center_access">COMMAND CENTER ACCESS</string>
+    <string name="command_center_access">ACCESO AL CENTRO DE MANDO</string>
 
-    <string name="mode_athlete">ATHLETE</string>
-    <string name="mode_staff">STAFF</string>
+    <string name="mode_athlete">ATLETA</string>
+    <string name="mode_staff">PERSONAL</string>
 
-    <string name="label_email">EMAIL</string>
-    <string name="placeholder_email">athlete@arena.com</string>
-    <string name="label_password">PASSWORD</string>
-    <string name="label_Confirmpassword"> CONFIRM PASSWORD</string>
-    <string name="description_hide_password">Hide password</string>
-    <string name="description_show_password">Show password</string>
-    <string name="description_login_background">Login background image</string>
+    <string name="label_email">CORREO ELECTRÓNICO</string>
+    <string name="placeholder_email">atleta@arena.com</string>
+    <string name="label_password">CONTRASEÑA</string>
+    <string name="label_Confirmpassword">CONFIRMAR CONTRASEÑA</string>
+    <string name="description_hide_password">Ocultar contraseña</string>
+    <string name="description_show_password">Mostrar contraseña</string>
+    <string name="description_login_background">Imagen de fondo de inicio de sesión</string>
 
-    <string name="remember_me">Remember me</string>
-    <string name="forgot_password">Forgot Password?</string>
-    <string name="btn_login">LOGIN</string>
+    <string name="remember_me">Recuérdame</string>
+    <string name="forgot_password">¿Olvidaste tu contraseña?</string>
+    <string name="btn_login">INICIAR SESIÓN</string>
 
-    <string name="dont_have_account">Don\'t have an account? </string>
-    <string name="Register"> Register</string>
+    <string name="dont_have_account">¿No tienes una cuenta? </string>
+    <string name="Register">Regístrate</string>
     <string name="toast_accessing_register">Accediendo al registro...</string>
 
-    <string name="staff_restricted_access">Restricted access area. Valid clearance required.</string>
-    <string name="label_clearance_id">CLEARANCE ID / EMAIL</string>
-    <string name="placeholder_staff_id">STAFF-ID-001</string>
-    <string name="label_access_code">ACCESS CODE</string>
-    <string name="request_access_reset">Request Access Reset</string>
-    <string name="btn_authenticate">AUTHENTICATE</string>
+    <string name="staff_restricted_access">Área de acceso restringido. Se requiere autorización válida.</string>
+    <string name="label_clearance_id">ID DE AUTORIZACIÓN / CORREO</string>
+    <string name="placeholder_staff_id">ID-PERSONAL-001</string>
+    <string name="label_access_code">CÓDIGO DE ACCESO</string>
+    <string name="request_access_reset">Solicitar restablecimiento de acceso</string>
+    <string name="btn_authenticate">AUTENTICAR</string>
 
     <string name="campo_vacio">Los campos no pueden estar vacíos</string>
     <string name="autenticacion_fallida">Autenticación Fallida</string>
     <string name="all_fields_required">Requiere llenar todos los campos</string>
-    <string name="password_too_short">la contraseña debe ser mayor de 6 caracteres</string>
+    <string name="password_too_short">La contraseña debe ser mayor de 6 caracteres</string>
 
-    <string name="registration_successful">Registration Successful!</string>
-    <string name="passwords_do_not_match">Passwords do not match.</string>
+    <string name="registration_successful">¡Registro Exitoso!</string>
+    <string name="passwords_do_not_match">Las contraseñas no coinciden.</string>
     <string name="invalid_email_domain">El correo debe tener un dominio .com (ejemplo: usuario@dominio.com)</string>
-    <string name="join_the_arena">JOIN THE ARENA</string>
-    <string name="institutional_performance_analytics">INSTITUTIONAL PERFORMANCE &amp; ANALYTICS</string>
-    <string name="label_first_name">FIRST NAME</string>
+    <string name="join_the_arena">ÚNETE A ARENA</string>
+    <string name="institutional_performance_analytics">RENDIMIENTO INSTITUCIONAL Y ANALÍTICA</string>
+    <string name="label_first_name">NOMBRE</string>
     <string name="placeholder_first_name">ERIK</string>
-    <string name="label_last_name">LAST NAME</string>
+    <string name="label_last_name">APELLIDO</string>
     <string name="placeholder_last_name">VON</string>
-    <string name="label_email_address">EMAIL ADDRESS</string>
+    <string name="label_email_address">DIRECCIÓN DE CORREO</string>
     <string name="placeholder_email_register">usuario@ejemplo.com</string>
-    <string name="label_security_credentials">SECURITY CREDENTIALS</string>
-    <string name="label_confirm_credentials">CONFIRM CREDENTIALS</string>
-    <string name="btn_register">REGISTER</string>
-    <string name="or_continue_with">OR CONTINUE WITH</string>
-    <string name="continue_with_google">Continue with Google</string>
-    <string name="already_have_account">Already have an account? </string>
-    <string name="login_action">Login</string>
-    <string name="login_success">Bienvenido de nuevo!</string>
+    <string name="label_security_credentials">CREDENCIALES DE SEGURIDAD</string>
+    <string name="label_confirm_credentials">CONFIRMAR CREDENCIALES</string>
+    <string name="btn_register">REGISTRARSE</string>
+    <string name="or_continue_with">O CONTINUAR CON</string>
+    <string name="continue_with_google">Continuar con Google</string>
+    <string name="already_have_account">¿Ya tienes una cuenta? </string>
+    <string name="login_action">Iniciar sesión</string>
+    <string name="login_success">¡Bienvenido de nuevo!</string>
+
+    <string name="reset_access">RESTABLECER ACCESO</string>
+    <string name="registered_email">CORREO REGISTRADO</string>
+    <string name="processing">PROCESANDO...</string>
+    <string name="send_reset_link">ENVIAR ENLACE</string>
+    <string name="back_to_login">VOLVER AL INICIO</string>
+    <string name="reset_email_sent">Se ha enviado un link a tu correo</string>
+    <string name="reset_email_empty">El correo no puede estar vacío</string>
+
+    <string name="google_signin_failed">Fallo al iniciar sesión con Google: %1$s</string>
+    <string name="google_invalid_credential">No se pudo obtener una credencial válida de Google</string>
+
+    <!-- Home & Facility List -->
+    <string name="menu_label">MENÚ</string>
+    <string name="search_placeholder">Buscar sedes, canchas...</string>
+    <string name="filter_all">Todos</string>
+    <string name="filter_nearby">Cercanos</string>
+    <string name="filter_top_rated">Mejor Valorados</string>
+    <string name="filter_indoor">Interior</string>
+    <string name="filter_outdoor">Exterior</string>
+    <string name="no_facilities_found">NO SE ENCONTRARON SEDES</string>
+    <string name="retry_button">REINTENTAR</string>
+    <string name="select_button">SELECCIONAR</string>
+    <string name="courts_available_format">%1$d CANCHAS DISP.</string>
+
+    <string name="crossfit_label">CROSSFIT</string>
+    <string name="crossfit_subtitle">CIMENTACIÓN DE ALTA INTENSIDAD</string>
+    <string name="live_athletes_format">En vivo: %1$s Atletas</string>
+
+    <string name="padel_label">PÁDEL</string>
+    <string name="padel_subtitle">PRECISIÓN Y AGILIDAD</string>
+    <string name="live_courts_format">En vivo: %1$s Canchas</string>
+
+    <string name="enter_arena">ENTRAR A ARENA</string>
+
+    <string name="error_no_facilities_for_sport">No se encontraron sedes para %1$s</string>
+    <string name="error_unknown_loading">Error desconocido al cargar sedes</string>
+    <string name="error_user_not_found">Usuario no encontrado en sesión</string>
+    <string name="error_loading_facilities">Error al cargar sedes</string>
+
+    <!-- Content Descriptions -->
+    <string name="desc_profile">Perfil</string>
+    <string name="desc_menu">Menú</string>
+    <string name="desc_enter">Entrar</string>
+    <string name="desc_sport_background">Fondo para %1$s</string>
 </resources>

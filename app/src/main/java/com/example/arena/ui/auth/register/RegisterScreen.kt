@@ -57,8 +57,8 @@ fun RegisterArenaScreen(
                     context.getString(R.string.registration_successful),
                     Toast.LENGTH_SHORT
                 ).show()
-                navController.navigate(Screen.Home.route) {
-                    popUpTo(Screen.Register.route) { inclusive = true }
+                navController.navigate(Screen.Home) {
+                    popUpTo(Screen.Register) { inclusive = true }
                 }
             }
 
@@ -99,7 +99,7 @@ fun RegisterArenaScreen(
                 )
 
                 if (errorMsg != null) {
-                    Toast.makeText(context, errorMsg, Toast.LENGTH_SHORT).show()
+                    viewModel.setError(errorMsg)
                 } else {
                     viewModel.registerUsuario(firstName, lastName, email, password)
                 }
@@ -113,7 +113,7 @@ fun RegisterArenaScreen(
                         val googleIdOption =
                             com.google.android.libraries.identity.googleid.GetGoogleIdOption.Builder()
                                 .setFilterByAuthorizedAccounts(false)
-                                .setServerClientId("999434492354-j22e5mba6c668cajqm8dtrfvd4c2864h.apps.googleusercontent.com")
+                                .setServerClientId("87579931946-tr0gevk4piu4iup332f6b42dpnda1gb3.apps.googleusercontent.com")
                                 .setAutoSelectEnabled(false)
                                 .build()
 
@@ -139,20 +139,23 @@ fun RegisterArenaScreen(
                             } catch (e: Exception) {
                                 Toast.makeText(
                                     context,
-                                    "Google Sign-In failed: ${e.localizedMessage}",
+                                    context.getString(
+                                        R.string.google_signin_failed,
+                                        e.localizedMessage
+                                    ),
                                     Toast.LENGTH_SHORT
                                 ).show()
                             }
                         } else {
                             Toast.makeText(
-                                context, "El formato de la credencial no es valido",
+                                context, context.getString(R.string.google_invalid_credential),
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
                     } catch (e: Exception) {
                         Toast.makeText(
                             context,
-                            "Google Sign-In failed: ${e.localizedMessage}",
+                            context.getString(R.string.google_signin_failed, e.localizedMessage),
                             Toast.LENGTH_SHORT
                         ).show()
                     }
@@ -227,58 +230,75 @@ fun RegisterArenaContent(
             Spacer(modifier = Modifier.height(16.dp))
 
             // --- FORM: FIRST NAME & LAST NAME ---
-            Row(modifier = Modifier.fillMaxWidth()) {
-                OutlinedTextField(
-                    value = firstName,
-                    onValueChange = { firstName = it.uppercase() },
-                    label = {
-                        Text(
-                            stringResource(R.string.label_first_name),
-                            fontSize = 10.sp,
-                            color = ArenaTextVariant
-                        )
-                    },
-                    placeholder = {
-                        Text(
-                            stringResource(R.string.placeholder_first_name),
-                            color = ArenaTextVariant.copy(alpha = 0.5f)
-                        )
-                    },
-                    singleLine = true,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = PrimaryNeon,
-                        unfocusedBorderColor = ArenaUnfocusedBorder,
-                        focusedContainerColor = ArenaSurfaceBase,
-                        unfocusedContainerColor = ArenaSurfaceBase
-                    ),
-                    modifier = Modifier.weight(1f)
-                )
-                Spacer(modifier = Modifier.width(12.dp))
-                OutlinedTextField(
-                    value = lastName,
-                    onValueChange = { lastName = it.uppercase() },
-                    label = {
-                        Text(
-                            stringResource(R.string.label_last_name),
-                            fontSize = 10.sp,
-                            color = ArenaTextVariant
-                        )
-                    },
-                    placeholder = {
-                        Text(
-                            stringResource(R.string.placeholder_last_name),
-                            color = ArenaTextVariant.copy(alpha = 0.5f)
-                        )
-                    },
-                    singleLine = true,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = PrimaryNeon,
-                        unfocusedBorderColor = ArenaUnfocusedBorder,
-                        focusedContainerColor = ArenaSurfaceBase,
-                        unfocusedContainerColor = ArenaSurfaceBase
-                    ),
-                    modifier = Modifier.weight(1f)
-                )
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    OutlinedTextField(
+                        value = firstName,
+                        onValueChange = { firstName = it.uppercase() },
+                        isError = isError && firstName.isBlank(),
+                        label = {
+                            Text(
+                                stringResource(R.string.label_first_name),
+                                fontSize = 10.sp,
+                                color = ArenaTextVariant
+                            )
+                        },
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = ArenaUnfocusedBorder,
+                            focusedLabelColor = MaterialTheme.colorScheme.primary,
+                            unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                            unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                            focusedContainerColor = MaterialTheme.colorScheme.surface,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surface
+                        ),
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    Spacer(modifier = Modifier.width(12.dp))
+
+                    OutlinedTextField(
+                        value = lastName,
+                        onValueChange = { lastName = it.uppercase() },
+                        isError = isError && lastName.isBlank(),
+                        label = {
+                            Text(
+                                stringResource(R.string.label_last_name),
+                                fontSize = 10.sp,
+                                color = ArenaTextVariant
+                            )
+                        },
+                        placeholder = {
+                            Text(
+                                stringResource(R.string.placeholder_last_name),
+                                color = ArenaTextVariant.copy(alpha = 0.5f)
+                            )
+                        },
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = ArenaUnfocusedBorder,
+                            focusedLabelColor = MaterialTheme.colorScheme.primary,
+                            unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                            unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                            focusedContainerColor = MaterialTheme.colorScheme.surface,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surface
+                        ),
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+
+                if (isError && errorMessage == stringResource(R.string.all_fields_required)) {
+                    Text(
+                        text = errorMessage,
+                        color = MaterialTheme.colorScheme.error,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -286,7 +306,7 @@ fun RegisterArenaContent(
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                isError = isError && email.isNotEmpty() && !email.endsWith(".com"),
+                isError = isError && (email.isBlank() || !email.endsWith(".com")),
                 label = {
                     Text(
                         stringResource(R.string.label_email_address),
@@ -312,9 +332,9 @@ fun RegisterArenaContent(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            if (isError && email.isNotEmpty() && !email.endsWith(".com")) {
+            if (isError && errorMessage != null && (email.isBlank() || !email.endsWith(".com"))) {
                 Text(
-                    text = stringResource(R.string.invalid_email_domain),
+                    text = if (email.isBlank()) stringResource(R.string.all_fields_required) else stringResource(R.string.invalid_email_domain),
                     color = MaterialTheme.colorScheme.error,
                     fontSize = 12.sp,
                     modifier = Modifier.padding(top = 4.dp)
@@ -326,7 +346,7 @@ fun RegisterArenaContent(
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
-                isError = isError && password.isBlank(),
+                isError = isError && (password.isBlank() || password.length < 6),
                 label = {
                     Text(
                         stringResource(R.string.label_password),
@@ -357,18 +377,17 @@ fun RegisterArenaContent(
                     unfocusedContainerColor = MaterialTheme.colorScheme.surface
                 ),
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
+                    .fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 singleLine = true
             )
 
-            if (isError && errorMessage != null) {
+            if (isError && errorMessage != null && (password.isBlank() || password.length < 6)) {
                 Text(
                     text = errorMessage,
                     color = MaterialTheme.colorScheme.error,
                     fontSize = 12.sp,
-                    modifier = Modifier.padding(bottom = 16.dp)
+                    modifier = Modifier.padding(top = 4.dp)
                 )
             }
 
@@ -377,7 +396,7 @@ fun RegisterArenaContent(
             OutlinedTextField(
                 value = confirmPassword,
                 onValueChange = { confirmPassword = it },
-                isError = isError && confirmPassword.isBlank(),
+                isError = isError && (confirmPassword.isBlank() || confirmPassword != password),
                 label = {
                     Text(
                         stringResource(R.string.label_Confirmpassword),
@@ -408,18 +427,17 @@ fun RegisterArenaContent(
                     unfocusedContainerColor = MaterialTheme.colorScheme.surface
                 ),
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
+                    .fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 singleLine = true
             )
 
-            if (isError && errorMessage != null) {
+            if (isError && errorMessage != null && (confirmPassword.isBlank() || confirmPassword != password)) {
                 Text(
-                    text = errorMessage,
+                    text = if (confirmPassword.isBlank()) stringResource(R.string.all_fields_required) else stringResource(R.string.passwords_do_not_match),
                     color = MaterialTheme.colorScheme.error,
                     fontSize = 12.sp,
-                    modifier = Modifier.padding(bottom = 16.dp)
+                    modifier = Modifier.padding(top = 4.dp)
                 )
             }
 

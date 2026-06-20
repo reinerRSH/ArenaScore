@@ -28,6 +28,7 @@ sealed interface LoginState{
     data object Idle : LoginState
     data object Loading: LoginState
     data object Success: LoginState
+    data object StaffSuccess: LoginState
     data class  Error(val message: String): LoginState
 }
 @HiltViewModel
@@ -76,7 +77,7 @@ class LoginViewModel @Inject constructor(
                     val loggedUser = UserMapper(
                         id = firebaseUser.uid,
                         email = firebaseUser.email ?: email,
-                        name = firebaseUser.displayName ?: "Athlete",
+                        name = firebaseUser.displayName ?: "Atleta",
                         lastName = "",
                         role = "ATHLETE",
                     )
@@ -112,7 +113,7 @@ class LoginViewModel @Inject constructor(
                 val firebaseUser = authResult.user
 
                 if (firebaseUser != null) {
-                    val displayName = firebaseUser.displayName ?: "Arena Athlete"
+                    val displayName = firebaseUser.displayName ?: "Atleta de Arena"
                     val nameParts = displayName.split(" ", limit = 2)
                     val firstName = nameParts.getOrNull(0) ?: displayName
                     val lastName = nameParts.getOrNull(1) ?: ""
@@ -143,6 +144,71 @@ class LoginViewModel @Inject constructor(
 fun resetLoginState(){
     uiState = LoginState.Idle
 }
+
+    fun resetPassword(email: String, onResult: (Boolean, String?) -> Unit) {
+        if (email.isBlank()) {
+            onResult(false, "El correo no puede estar vacío")
+            return
+        }
+
+
+        auth.sendPasswordResetEmail(email)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    onResult(true, "Se ha enviado un link a tu correo")
+                } else {
+                    onResult(false, task.exception?.message ?: "Error al enviar el correo")
+                }
+            }
+    }
+
+    fun authenticateStaff(clearanceID: String, accessCode: String, onResult: (Boolean, String?) -> Unit) {
+        if (clearanceID.isBlank() || accessCode.isBlank()) {
+            onResult(false, "Por favor completa todos los campos")
+            return
+        }
+
+        uiState = LoginState.Loading
+
+        val db = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+
+        db.collection("staff").document(clearanceID).get()
+            .addOnSuccessListener { document ->
+                if (!document.exists()) {
+                    uiState = LoginState.Idle
+                    onResult(false, "ID de administrador no encontrado")
+                    return@addOnSuccessListener
+                }
+
+                val isActive = document.getBoolean("isActive") ?: false
+                val storeCode = document.getString("accessCode")
+                val expiryDate = document.getString("expireDate") ?: "2099-12-31"
+                val today = java.time.LocalDate.now().toString()
+
+                when {
+                    !isActive -> {
+                        uiState = LoginState.Idle
+                        onResult(false, "Acceso desactivado")
+                    }
+                    accessCode != storeCode -> {
+                        uiState = LoginState.Idle
+                        onResult(false, "Código Incorrecto")
+                    }
+                    expiryDate < today -> {
+                        uiState = LoginState.Idle
+                        onResult(false, "Código Expirado")
+                    }
+                    else -> {
+                        uiState = LoginState.StaffSuccess
+                        onResult(true, "Acceso concedido")
+                    }
+                }
+            }
+            .addOnFailureListener { e ->
+                uiState = LoginState.Error(e.localizedMessage ?: "Error de conexión")
+                onResult(false, "Error de conexión ${e.localizedMessage}")
+            }
+    }
 
 
 

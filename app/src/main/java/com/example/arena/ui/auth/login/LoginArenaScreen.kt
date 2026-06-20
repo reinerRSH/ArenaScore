@@ -77,6 +77,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import com.example.arena.navigation.Screen
 import com.example.arena.LoginMode
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
 
 
@@ -93,8 +94,8 @@ fun LoginArenaScreen(
         when (uiState) {
             is LoginState.Success -> {
                 makeText(context, context.getString(R.string.login_success), Toast.LENGTH_SHORT).show()
-                navController.navigate(Screen.Home.route) {
-                    popUpTo(Screen.Login.route) {
+                navController.navigate(Screen.Home) {
+                    popUpTo(Screen.Login) {
                         this.inclusive = true
                     }
                 }
@@ -109,6 +110,7 @@ fun LoginArenaScreen(
     LoginArenaContent(
         uiState = uiState,
         navController = navController,
+        onModeChange = { viewModel.resetLoginState() },
         onLogin = { email, password, rememberMe ->
             viewModel.loginUsuario(email, password, rememberMe)
         },
@@ -119,7 +121,7 @@ fun LoginArenaScreen(
 
                     val googleIdOption = com.google.android.libraries.identity.googleid.GetGoogleIdOption.Builder()
                         .setFilterByAuthorizedAccounts(false)
-                        .setServerClientId("999434492354-j22e5mba6c668cajqm8dtrfvd4c2864h.apps.googleusercontent.com")
+                        .setServerClientId("87579931946-tr0gevk4piu4iup332f6b42dpnda1gb3.apps.googleusercontent.com")
                         .setAutoSelectEnabled(false)
                         .build()
 
@@ -143,14 +145,25 @@ fun LoginArenaScreen(
                         }catch (e: Exception){
                             Toast.makeText(
                                 context,
-                                "Google Sign-In failed: ${e.localizedMessage}",
+                                context.getString(R.string.google_signin_failed, e.localizedMessage),
                                 Toast.LENGTH_SHORT).show()
                         }
                     } else {
-                        makeText(context, "No se pudo obtener una credencial válida de Google", Toast.LENGTH_SHORT).show()
+                        makeText(context, context.getString(R.string.google_invalid_credential), Toast.LENGTH_SHORT).show()
                     }
                 } catch (e: Exception) {
-                    makeText(context, "Google Sign-In failed: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+                    makeText(context, context.getString(R.string.google_signin_failed, e.localizedMessage), Toast.LENGTH_SHORT).show()
+                }
+            }
+        },
+        onAuthenticateStaff = { id, code ->
+            viewModel.authenticateStaff(id, code) { success, message ->
+                if (success) {
+                    navController.navigate(Screen.Home) {
+                        popUpTo(Screen.Login) { inclusive = true }
+                    }
+                } else {
+                    Toast.makeText(context, message ?: "Error desconocido", Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -160,8 +173,10 @@ fun LoginArenaScreen(
 @Composable
 fun LoginArenaContent(
     uiState: LoginState,
+    onModeChange: () -> Unit,
     onLogin: (String, String, Boolean) -> Unit,
     onLoginGoogle: () -> Unit,
+    onAuthenticateStaff: (String, String) -> Unit,
     navController: NavController
 ) {
     val context = LocalContext.current
@@ -239,7 +254,10 @@ fun LoginArenaContent(
                             if (isAthlete) MaterialTheme.colorScheme.surfaceVariant else Color.Transparent,
                             RoundedCornerShape(6.dp)
                         )
-                        .clickable { currentMode = LoginMode.ATHLETE },
+                        .clickable {
+                            currentMode = LoginMode.ATHLETE
+                            onModeChange()
+                        },
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
@@ -260,7 +278,10 @@ fun LoginArenaContent(
                             if (isStaff) MaterialTheme.colorScheme.surfaceVariant else Color.Transparent,
                             RoundedCornerShape(6.dp)
                         )
-                        .clickable { currentMode = LoginMode.STAFF },
+                        .clickable {
+                            currentMode = LoginMode.STAFF
+                            onModeChange()
+                        },
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
@@ -382,7 +403,7 @@ fun LoginArenaContent(
                             color = MaterialTheme.colorScheme.primary,
                             fontSize = 12.sp,
                             modifier = Modifier
-                                .clickable { }
+                                .clickable { navController.navigate(Screen.ForgotPassword) }
                                 .padding(4.dp)
                         )
                     }
@@ -457,7 +478,7 @@ fun LoginArenaContent(
                     onClick = { offset ->
                         registerText.getStringAnnotations(tag = "register", start = offset, end = offset)
                             .firstOrNull()?.let {
-                                navController.navigate(Screen.Register.route)
+                                navController.navigate(Screen.Register)
                             }
                     }
                 )
@@ -588,7 +609,7 @@ fun LoginArenaContent(
                         LoadingIndicator()
                     } else {
                         OutlinedButton(
-                            onClick = { onLogin(clearanceId, accessCode, false) },
+                            onClick = { onAuthenticateStaff(clearanceId, accessCode) },
                             border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
                             colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary),
                             shape = RoundedCornerShape(8.dp),
@@ -627,8 +648,10 @@ fun ArenaLoginPreview() {
         Surface(modifier = Modifier.fillMaxSize()) {
             LoginArenaContent(
                 uiState = LoginState.Idle,
+                onModeChange = {},
                 onLogin = { _, _, _ -> },
                 onLoginGoogle = {},
+                onAuthenticateStaff = { _, _ -> },
                 navController = NavController(LocalContext.current)
             )
         }

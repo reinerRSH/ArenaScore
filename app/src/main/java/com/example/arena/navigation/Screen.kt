@@ -1,15 +1,27 @@
 package com.example.arena.navigation
 
-import androidx.compose.runtime.Composable
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
+import kotlinx.serialization.Serializable
 
+/**
+ * Definición de rutas Type-Safe para la navegación de la app.
+ */
+sealed interface Screen {
+    
+    @Serializable
+    object Login : Screen
 
+    @Serializable
+    object Register : Screen
 
-sealed class Screen (val route: String){
+    @Serializable
+    object Home : Screen
 
-    object Login : Screen("login_Screen")
-    object Register : Screen("register_Screen")
-    object Home : Screen("home_Screen")
+    @Serializable
+    object ForgotPassword : Screen
+
+    @Serializable
+    data class FacilityList(val sport: String) : Screen
+
+    @Serializable
+    data class SelectCourt(val sedeId: String) : Screen
 }
