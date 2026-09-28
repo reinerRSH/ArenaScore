@@ -4,7 +4,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -30,13 +31,17 @@ fun OutlinedTextFieldShared(
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text(label, fontFamily = FontFamily.Monospace, fontSize = 10.sp, fontWeight = FontWeight.Bold) },
+        label = { Text(label, fontSize = 10.sp, fontWeight = FontWeight.Bold) },
         shape = RoundedCornerShape(8.dp),
         visualTransformation = if (isPassword && !passwordVisible) PasswordVisualTransformation() else VisualTransformation.None,
         trailingIcon = {
             if (isPassword) {
                 IconButton(onClick = { onPasswordVisibleChange(!passwordVisible) }) {
-                    Icon(Icons.Default.Lock, null)
+                    Icon(
+                        imageVector = if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                        contentDescription = null,
+                        tint = ArenaTextVariant
+                    )
                 }
             }
         },
@@ -48,9 +53,15 @@ fun OutlinedTextFieldShared(
             focusedContainerColor = ArenaSurfaceBase,
             unfocusedContainerColor = ArenaSurfaceBase,
             focusedTextColor = Color.White,
-            unfocusedTextColor = Color.White
+            unfocusedTextColor = Color.White,
+            cursorColor = ArenaPrimaryContainer
         ),
         modifier = Modifier.fillMaxWidth(),
+        textStyle = LocalTextStyle.current.copy(
+            color = Color.White, 
+            fontSize = 14.sp,
+            fontFamily = if (isPassword) FontFamily.Default else null
+        ),
         singleLine = true,
         keyboardOptions = KeyboardOptions(keyboardType = if (isPassword) KeyboardType.Password else KeyboardType.Email)
     )

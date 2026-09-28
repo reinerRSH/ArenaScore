@@ -10,8 +10,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -34,7 +34,7 @@ fun ReceiptModalShared(
         ) {
             Column(modifier = Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                 Icon(Icons.Default.Info, null, tint = ArenaPrimaryContainer, modifier = Modifier.size(48.dp))
-                Text("COMPROBANTE DE RESERVA", color = Color.White, fontWeight = FontWeight.Black, fontSize = 18.sp, modifier = Modifier.padding(top = 16.dp))
+                Text("COMPROBANTE DE RESERVA", color = Color.White, fontWeight = FontWeight.Black, fontSize = 14.sp, modifier = Modifier.padding(top = 16.dp))
                 HorizontalDivider(color = ArenaStaffBorder, modifier = Modifier.padding(vertical = 16.dp))
                 
                 ReceiptRowShared("CANCHA", reserva.canchaid)
@@ -69,7 +69,7 @@ fun ReceiptModalShared(
 @Composable
 fun ReceiptRowShared(label: String, value: String, color: Color = Color.White) {
     Row(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-        Text(label, color = ArenaTextVariant, fontSize = 11.sp, fontWeight = FontWeight.Bold)
-        Text(value, color = color, fontSize = 12.sp, fontWeight = FontWeight.Black, fontFamily = FontFamily.Monospace)
+        Text(label, color = ArenaTextVariant, fontSize = 9.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+        Text(value, color = color, fontSize = 10.sp, fontWeight = FontWeight.Black, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }

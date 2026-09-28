@@ -17,6 +17,7 @@ private val ArenaColorScheme = darkColorScheme(
     surfaceVariant = ArenaSurfaceElevated,
     primary = ArenaPrimaryContainer,
     secondary = ArenaMagenta,
+    tertiary = ArenaSuccess,
     onPrimary = ArenaOnPrimaryFixed,
     onSurface = ArenaTextPrimary,
     onSurfaceVariant = ArenaTextVariant,
@@ -28,7 +29,7 @@ private val ArenaColorScheme = darkColorScheme(
 fun EliteAthleteOSTheme(content: @Composable () -> Unit) {
     MaterialTheme(
         colorScheme = ArenaColorScheme,
-        // Aquí podríamos agregar tipografías personalizadas más adelante
+        typography = Typography,
         content = content
     )
 }

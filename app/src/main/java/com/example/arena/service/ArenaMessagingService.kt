@@ -2,41 +2,73 @@ package com.example.arena.service
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import com.example.arena.MainActivity
 import com.example.arena.R
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
 class ArenaMessagingService : FirebaseMessagingService() {
 
-    override fun onMessageReceived(message: RemoteMessage) {
-        val channelId = message.data["channel"] ?: "user_alerts"
-        val title = message.notification?.title ?: "Arena Notification"
-        val body = message.notification?.body ?: ""
-
-        showNotification(channelId, title, body)
+    override fun onNewToken(token: String) {
+        super.onNewToken(token)
     }
 
-    private fun showNotification(channelId: String, title: String, body: String) {
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    override fun onMessageReceived(message: RemoteMessage) {
+        val channelId = message.data["channel"] ?: "user_alerts"
+        val title = message.notification?.title ?: message.data["title"] ?: "Arena Notification"
+        val body = message.notification?.body ?: message.data["body"] ?: ""
+        val reservaId = message.data["reserva_id"] ?: ""
+        val sedeId = message.data["sede_id"]
+
+        val notificationId = if (reservaId.isNotEmpty()) reservaId.hashCode() else System.currentTimeMillis().toInt()
+
+        showNotification(channelId, title, body, notificationId, sedeId)
+    }
+
+    private fun showNotification(
+        channelId: String,
+        title: String,
+        body: String,
+        notificationId: Int,
+        sedeId: String? = null
+    ) {
+        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = if (channelId == "admin_alerts") "Admin Alerts" else "User Alerts"
-            val importance = if (channelId == "admin_alerts") NotificationManager.IMPORTANCE_HIGH else NotificationManager.IMPORTANCE_DEFAULT
-            val channel = NotificationChannel(channelId, name, importance)
+            val name = if (channelId == "admin_alerts") "Alertas Administrador" else "Alertas Usuario"
+            val channel = NotificationChannel(channelId, name, NotificationManager.IMPORTANCE_HIGH).apply {
+                enableVibration(true)
+                enableLights(true)
+            }
             notificationManager.createNotificationChannel(channel)
         }
 
+        val intent = Intent(this, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            putExtra("target_screen", if (channelId == "admin_alerts") "ADMIN_PAYMENTS" else "USER_RESERVATIONS")
+            if (sedeId != null) putExtra("sede_id", sedeId)
+        }
+
+        val pendingIntent = PendingIntent.getActivity(
+            this, notificationId, intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
         val notification = NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(R.drawable.logo_branding)
+            .setSmallIcon(R.drawable.ic_padel_icon)
             .setContentTitle(title)
             .setContentText(body)
-            .setPriority(if (channelId == "admin_alerts") NotificationCompat.PRIORITY_HIGH else NotificationCompat.PRIORITY_DEFAULT)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setDefaults(NotificationCompat.DEFAULT_ALL)
             .setAutoCancel(true)
+            .setContentIntent(pendingIntent)
             .build()
 
-        notificationManager.notify(System.currentTimeMillis().toInt(), notification)
+        notificationManager.notify(notificationId, notification)
     }
 }

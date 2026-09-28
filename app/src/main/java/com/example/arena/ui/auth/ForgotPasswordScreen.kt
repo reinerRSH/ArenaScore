@@ -24,6 +24,7 @@ import com.example.arena.View.ui.theme.ArenaUnfocusedBorder
 import com.example.arena.View.ui.theme.CardRegister
 import com.example.arena.View.ui.theme.EliteAthleteOSTheme
 import com.example.arena.ui.auth.login.LoginViewModel
+import com.example.arena.ui.components.OutlinedTextFieldShared
 
 @Composable
 fun ResetPasswordScreen(
@@ -64,7 +65,7 @@ fun ResetPasswordContent(
         contentAlignment = Alignment.Center
     ) {
         Image(
-            painter = painterResource(id = R.drawable.logo_branding),
+            painter = painterResource(R.drawable.logo_branding),
             contentDescription = stringResource(R.string.description_login_background),
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
@@ -88,38 +89,20 @@ fun ResetPasswordContent(
 
             Text(
                 text = stringResource(R.string.reset_access),
-                fontSize = 32.sp,
-                lineHeight = 40.sp,
+                fontSize = 24.sp,
+                lineHeight = 32.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White, // Forzado a Blanco puro como pediste
-                textAlign = TextAlign.Center
+                color = Color.White,
+                textAlign = TextAlign.Center,
+                maxLines = 1
             )
             
             Spacer(modifier = Modifier.height(24.dp))
 
-            OutlinedTextField(
+            OutlinedTextFieldShared(
                 value = email,
                 onValueChange = { email = it },
-                label = { 
-                    Text(
-                        stringResource(R.string.registered_email),
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold
-                    ) 
-                },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = ArenaUnfocusedBorder,
-                    focusedLabelColor = MaterialTheme.colorScheme.primary,
-                    unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                    unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
-                    focusedContainerColor = MaterialTheme.colorScheme.surface,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.surface
-                ),
-                shape = RoundedCornerShape(8.dp)
+                label = stringResource(R.string.registered_email)
             )
 
             Spacer(modifier = Modifier.height(32.dp))

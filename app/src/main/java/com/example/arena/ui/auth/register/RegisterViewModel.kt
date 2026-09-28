@@ -10,6 +10,7 @@ import com.example.arena.Model.Di.Entitys.UserEntity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.userProfileChangeRequest
+import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -21,6 +22,7 @@ import javax.inject.Inject
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
     private val auth: FirebaseAuth,
+    private val db: FirebaseFirestore,
     private val userDao: UserDao
 ) : ViewModel() {
 
@@ -55,7 +57,6 @@ class RegisterViewModel @Inject constructor(
 
         viewModelScope.launch {
             try {
-                delay(2000)
                 val authResult = auth.createUserWithEmailAndPassword(email, password).await()
                 val uid =
                     authResult.user?.uid ?: throw Exception("Incapaz de obtener el UID del usuario")
@@ -67,14 +68,29 @@ class RegisterViewModel @Inject constructor(
 
                 authResult.user?.updateProfile(profileUpdate)?.await()
 
+                // Guardar en Firestore colección 'user'
+                val userData = mapOf(
+                    "uid" to uid,
+                    "name" to name.uppercase(),
+                    "lastName" to lastName.uppercase(),
+                    "email" to email,
+                    "role" to "ATHLETE",
+                    "registrationDate" to System.currentTimeMillis()
+                )
+                
+                db.collection("user").document(uid).set(userData).await()
+
                 withContext(Dispatchers.IO) {
+                    // Limpiar cualquier sesión previa antes de insertar el nuevo usuario
+                    userDao.deleteUser()
+                    
                     val athleteEntity = UserEntity(
                         uid = uid,
-                        name = name,
-                        lastName = lastName,
+                        name = name.uppercase(),
+                        lastName = lastName.uppercase(),
                         email = email,
                         role = "ATHLETE",
-                        isRemenbered = true
+                        isRemembered = true
                     )
 
                     userDao.insertUser(athleteEntity)
@@ -91,26 +107,38 @@ class RegisterViewModel @Inject constructor(
 
         viewModelScope.launch {
             try {
-                delay(2000)
                 val credential = GoogleAuthProvider.getCredential(idToken, null)
                 val authResult = auth.signInWithCredential(credential).await()
                 val firebaseUser =
                     authResult.user ?: throw Exception("La autenticación de Google no devolvió un usuario válido.")
 
-                val displayName = firebaseUser.displayName ?: "Atleta de Arena"
+                val displayName = firebaseUser.displayName ?: "ATLETA"
                 val nameParts = displayName.split(" ", limit = 2)
                 val firstName = nameParts.getOrNull(0) ?: displayName
                 val lastName = nameParts.getOrNull(1) ?: ""
 
+                // Guardar/Actualizar en Firestore colección 'user'
+                val userData = mapOf(
+                    "uid" to firebaseUser.uid,
+                    "name" to firstName.uppercase(),
+                    "lastName" to lastName.uppercase(),
+                    "email" to firebaseUser.email,
+                    "role" to "ATHLETE",
+                    "registrationDate" to System.currentTimeMillis()
+                )
+                
+                db.collection("user").document(firebaseUser.uid).set(userData).await()
 
                 withContext(Dispatchers.IO) {
+                    userDao.deleteUser()
+
                     val athleteEntity = UserEntity(
                         uid = firebaseUser.uid,
                         name = firstName.uppercase(),
                         lastName = lastName.uppercase(),
                         email = firebaseUser.email,
                         role = "ATHLETE",
-                        isRemenbered = true
+                        isRemembered = true
                         )
 
                     userDao.insertUser(athleteEntity)

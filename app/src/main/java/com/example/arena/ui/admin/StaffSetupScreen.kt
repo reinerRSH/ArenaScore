@@ -8,6 +8,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -16,6 +17,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.arena.ui.components.ArenaTopBarShared
 import com.example.arena.ui.components.OutlinedTextFieldShared
 import com.example.arena.ui.theme.*
+import com.example.arena.util.servicesList
 
 @Composable
 fun StaffSetupScreen(
@@ -27,6 +29,7 @@ fun StaffSetupScreen(
     var venueName by remember { mutableStateOf("") }
     var numCourts by remember { mutableStateOf("1") }
     var extras by remember { mutableStateOf("") }
+    val selectedServices = remember { mutableStateListOf<String>() }
 
     LaunchedEffect(uiState.setupComplete) {
         if (uiState.setupComplete && uiState.generatedSedeId != null) {
@@ -55,7 +58,6 @@ fun StaffSetupScreen(
                 "Bienvenido, configura tu sede para comenzar.",
                 color = ArenaTextVariant,
                 fontSize = 14.sp,
-                fontFamily = FontFamily.Monospace,
                 modifier = Modifier.align(Alignment.Start)
             )
 
@@ -83,13 +85,49 @@ fun StaffSetupScreen(
                 label = "EXTRAS (E.J. PALAS, AGUA, SEPARADOS POR COMA)"
             )
 
+            Spacer(modifier = Modifier.height(24.dp))
+            
+            Text(
+                "SERVICIOS DISPONIBLES",
+                color = ArenaPrimaryContainer,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Black,
+                modifier = Modifier.align(Alignment.Start)
+            )
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            servicesList.forEach { service ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Checkbox(
+                        checked = selectedServices.contains(service.name),
+                        onCheckedChange = { 
+                            if (it) selectedServices.add(service.name)
+                            else selectedServices.remove(service.name)
+                        },
+                        colors = CheckboxDefaults.colors(
+                            checkedColor = ArenaPrimaryContainer,
+                            uncheckedColor = ArenaTextVariant
+                        )
+                    )
+                    Text(
+                        text = service.name.uppercase(),
+                        color = Color.White,
+                        fontSize = 12.sp
+                    )
+                }
+            }
+
             Spacer(modifier = Modifier.height(32.dp))
 
             Button(
                 onClick = { 
                     val courts = numCourts.toIntOrNull() ?: 1
                     val extrasList = extras.split(",").map { it.trim() }.filter { it.isNotEmpty() }
-                    viewModel.setupVenue(venueName, courts, extrasList)
+                    viewModel.setupVenue(venueName, courts, extrasList, selectedServices.toList())
                 },
                 modifier = Modifier.fillMaxWidth().height(56.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = ArenaPrimaryContainer),
@@ -102,8 +140,7 @@ fun StaffSetupScreen(
                     Text(
                         "CREAR SEDE",
                         color = ArenaOnPrimaryFixed,
-                        fontWeight = FontWeight.Black,
-                        fontFamily = FontFamily.Monospace
+                        fontWeight = FontWeight.Black
                     )
                 }
             }

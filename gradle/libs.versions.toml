@@ -9,6 +9,9 @@ lifecycleRuntimeCompose = "2.8.7"
 activityCompose = "1.10.0"
 composeBom = "2025.02.00"
 kotlin = "2.1.0"
+koin = "4.0.0"
+ktor = "3.0.1"
+firebaseKmp = "2.1.0"
 kotlinxSerialization = "1.8.0"
 hilt = "2.51.1"
 room = "2.6.1"
@@ -21,6 +24,7 @@ firebaseBom = "33.1.2"
 credentials = "1.6.0"
 googleid = "1.2.0"
 coil = "2.7.0"
+coreSplashScreen = "1.0.1"
 
 
 [libraries]
@@ -57,11 +61,25 @@ firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.r
 firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore" }
+firebase-storage = { group = "com.google.firebase", name = "firebase-storage" }
+firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging" }
 androidx-credentials = { group = "androidx.credentials", name = "credentials", version.ref = "credentials" }
 androidx-credentials-play-services-auth = { group = "androidx.credentials", name = "credentials-play-services-auth", version.ref = "credentials" }
 googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleid" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
+androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "coreSplashScreen" }
+
+# Multiplatform
+koin-core = { group = "io.insert-koin", name = "koin-core", version.ref = "koin" }
+koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = "koin" }
+koin-compose = { group = "io.insert-koin", name = "koin-compose", version.ref = "koin" }
+ktor-client-core = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktor" }
+ktor-client-okhttp = { group = "io.ktor", name = "ktor-client-okhttp", version.ref = "ktor" }
+ktor-client-darwin = { group = "io.ktor", name = "ktor-client-darwin", version.ref = "ktor" }
+firebase-kmp-auth = { group = "dev.gitlive", name = "firebase-auth", version.ref = "firebaseKmp" }
+firebase-kmp-firestore = { group = "dev.gitlive", name = "firebase-firestore", version.ref = "firebaseKmp" }
+firebase-kmp-storage = { group = "dev.gitlive", name = "firebase-storage", version.ref = "firebaseKmp" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
@@ -70,3 +88,4 @@ kotlinCompose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kot
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+jetbrainsCompose = { id = "org.jetbrains.compose", version = "1.7.0" }

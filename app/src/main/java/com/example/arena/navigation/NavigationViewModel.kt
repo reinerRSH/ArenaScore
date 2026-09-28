@@ -26,10 +26,10 @@ class NavigationViewModel @Inject constructor(private val userDao: UserDao) : Vi
 
         viewModelScope.launch {
             val user = withContext(Dispatchers.IO) {
-                userDao.getRemenberedUser()
+                userDao.getRememberedUser()
             }
 
-            starDestination = if (user != null && user.isRemenbered) {
+            starDestination = if (user != null && user.isRemembered) {
                 "home_Screen" // Reemplaza "home_Screen" con la ruta real de tu pantalla de inicio
             } else {
                 "login_Screen" // Reemplaza "login_Screen" con la ruta real de tu pantalla de inicio de sesión

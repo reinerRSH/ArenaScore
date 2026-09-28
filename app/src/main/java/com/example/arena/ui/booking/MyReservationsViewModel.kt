@@ -9,6 +9,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -37,9 +38,22 @@ class MyReservationsViewModel @Inject constructor(
             try {
                 val user = userRepository.getCurrentUser()
                 if (user != null) {
-                    val reservations = facilityRepository.getReservasByUsuario(user.uid)
+                    val rawReservations = facilityRepository.getReservasByUsuario(user.uid)
+                    
+                    // Enriquecer reservas de forma concurrente para mejor rendimiento
+                    val enrichedReservations = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                        rawReservations.map { reserva ->
+                            if (reserva.canchaImageUrl.isEmpty()) {
+                                val cancha = facilityRepository.getCanchaById(reserva.canchaid)
+                                reserva.copy(canchaImageUrl = cancha?.imageUrl ?: "")
+                            } else {
+                                reserva
+                            }
+                        }
+                    }
+
                     _uiState.value = _uiState.value.copy(
-                        reservations = reservations.sortedByDescending { it.fecha + it.horaInicio },
+                        reservations = enrichedReservations.sortedByDescending { it.fecha + it.horaInicio },
                         isLoading = false
                     )
                 } else {
@@ -47,6 +61,18 @@ class MyReservationsViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(isLoading = false, error = e.localizedMessage)
+            }
+        }
+    }
+
+    fun deleteReservation(reservaId: String) {
+        viewModelScope.launch {
+            val result = facilityRepository.eliminarReserva(reservaId)
+            if (result.isSuccess) {
+                // Actualizar lista local
+                _uiState.update { state ->
+                    state.copy(reservations = state.reservations.filter { it.id != reservaId })
+                }
             }
         }
     }

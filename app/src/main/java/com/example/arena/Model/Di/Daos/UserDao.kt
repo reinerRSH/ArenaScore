@@ -1,7 +1,6 @@
 package com.example.arena.Model.Di.Daos
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -16,11 +15,11 @@ interface UserDao {
 
 
     @Query("SELECT * FROM user_table LIMIT 1")
-    suspend fun getUSer(): UserEntity?
+    suspend fun getUser(): UserEntity?
 
     @Query("DELETE FROM user_table")
-    suspend fun deleteUser ()
+    suspend fun deleteUser()
 
     @Query("SELECT * FROM user_table LIMIT 1")
-    suspend fun getRemenberedUser(): UserEntity?
+    suspend fun getRememberedUser(): UserEntity?
 }

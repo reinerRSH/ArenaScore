@@ -23,6 +23,9 @@ import com.example.arena.ui.theme.*
 @Composable
 fun ProfileScreen(
     onNavigateBack: () -> Unit,
+    notifications: List<com.example.arena.domain.Reserva> = emptyList(),
+    onNotificationClick: () -> Unit = {},
+    onHistoryClick: () -> Unit = {},
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -54,7 +57,10 @@ fun ProfileScreen(
             ArenaTopBarShared(
                 title = "MI PERFIL",
                 onNavigateBack = onNavigateBack,
-                showBack = true
+                showBack = true,
+                notificationCount = notifications.size,
+                onNotificationClick = onNotificationClick,
+                onHistoryClick = onHistoryClick
             )
         },
         containerColor = ArenaSurfaceBase
@@ -129,8 +135,7 @@ fun ProfileScreen(
                         Text(
                             "GUARDAR PERFIL",
                             color = ArenaOnPrimaryFixed,
-                            fontWeight = FontWeight.Black,
-                            fontFamily = FontFamily.Monospace
+                            fontWeight = FontWeight.Black
                         )
                     }
                 }

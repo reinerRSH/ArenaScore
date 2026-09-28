@@ -11,6 +11,7 @@ data class UserEntity(
     val name: String,
     val lastName: String,
     val role: String,
-    val isRemenbered: Boolean
-
+    val phone: String = "",
+    val imageUrl: String = "",
+    val isRemembered: Boolean
 )

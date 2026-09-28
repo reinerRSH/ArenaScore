@@ -9,6 +9,7 @@ import androidx.navigation.NavController
 import com.example.arena.domain.Reserva
 import com.example.arena.navigation.Screen
 import com.example.arena.ui.court.CourtViewModel
+import com.example.arena.ui.court.CourtUiState
 import com.example.arena.ui.home.HomeViewModel
 
 @Composable
@@ -16,7 +17,8 @@ fun CourtSelectionScreen(
     navController: NavController,
     sedeId: String,
     viewModel: CourtViewModel = hiltViewModel(),
-    homeViewModel: HomeViewModel = hiltViewModel()
+    homeViewModel: HomeViewModel = hiltViewModel(),
+    onNavigateBack: () -> Unit = { navController.popBackStack() }
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val notifications by homeViewModel.notifications.collectAsState()
@@ -24,7 +26,7 @@ fun CourtSelectionScreen(
     var selectedReceipt by remember { mutableStateOf<Reserva?>(null) }
 
     LaunchedEffect(sedeId) {
-        viewModel.loadCourts(sedeId)
+        viewModel.loadCourtSelection(sedeId)
     }
 
     if (selectedReceipt != null) {
@@ -43,13 +45,15 @@ fun CourtSelectionScreen(
         )
     }
 
+    val stateSuccess = (uiState as? CourtUiState.Success)?.state
+
     CourtSelectionContentShared(
-        sede = uiState.selectedSede,
-        canchas = uiState.canchas,
+        sede = stateSuccess?.selectedSede,
+        canchas = stateSuccess?.canchas ?: emptyList(),
         notifications = notifications,
         onNavigateBack = { navController.popBackStack() },
         onCourtSelected = { cancha ->
-            navController.navigate(Screen.BookingSchedule(canchaId = cancha.id, sedeId = sedeId))
+            navController.navigate(Screen.BookingSchedule(canchaId = cancha.id, sedeId = sedeId, tipoReserva = "JUEGO"))
         },
         onNotificationClick = {
             if (notifications.isNotEmpty()) selectedReceipt = notifications.last()

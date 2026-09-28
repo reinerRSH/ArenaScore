@@ -13,7 +13,7 @@ class UserRepository @Inject constructor(
     private val db: FirebaseFirestore
 ) {
     suspend fun getCurrentUser(): UserEntity? {
-        return userDao.getUSer()
+        return userDao.getUser()
     }
 
     suspend fun updateUserProfile(uid: String, name: String, lastName: String, phone: String, imageUrl: String) {
@@ -24,10 +24,10 @@ class UserRepository @Inject constructor(
             "phone" to phone,
             "imageUrl" to imageUrl
         )
-        db.collection("users").document(uid).update(userUpdates).await()
+        db.collection("user").document(uid).update(userUpdates).await()
 
         // Update local Room database
-        val currentUser = userDao.getUSer()
+        val currentUser = userDao.getUser()
         if (currentUser != null && currentUser.uid == uid) {
             val updatedUser = currentUser.copy(
                 name = name,

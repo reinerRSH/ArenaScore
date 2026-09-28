@@ -33,28 +33,31 @@ class StaffSetupViewModel @Inject constructor(
         venueName: String,
         numCourts: Int,
         extras: List<String>,
+        servicios: List<String> = emptyList(),
         sportType: String = "PADEL" // Default for setup
     ) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isSaving = true, error = null)
             try {
-                val user = userDao.getUSer() ?: throw Exception("Usuario no encontrado")
+                val user = userDao.getUser() ?: throw Exception("Usuario no encontrado")
                 
                 val batch = db.batch()
                 
                 // 1. Create Sede
-                val sedeRef = db.collection("sedes").document()
+                val sedeRef = db.collection("sede").document()
                 val sedeId = sedeRef.id
                 val newSede = mapOf(
                     "id" to sedeId,
                     "nombreSede" to venueName,
-                    "tipoSede" to sportType,
+                    "tipo" to sportType,
                     "totalCanchas" to numCourts,
-                    "courtsAvailable" to numCourts,
+                    "canchasDisponibles" to numCourts,
                     "ubicacion" to "Por definir",
-                    "imageUrl" to "",
                     "tags" to extras,
-                    "starRating" to 5.0
+                    "servicios" to servicios,
+                    "calificacion" to 5.0,
+                    "suscripcionStatus" to "ACTIVA",
+                    "precioBase" to 45.0
                 )
                 batch.set(sedeRef, newSede)
                 
@@ -63,9 +66,10 @@ class StaffSetupViewModel @Inject constructor(
                     val canchaRef = db.collection("canchas").document()
                     val newCancha = mapOf(
                         "id" to canchaRef.id,
-                        "sedeId" to sedeId,
+                        "sedeid" to sedeId,
                         "nombre" to "Cancha $i",
                         "tipo" to sportType,
+                        "estado" to "ACTIVA",
                         "imageUrl" to "",
                         "patrocinador" to "Arena"
                     )
@@ -74,7 +78,7 @@ class StaffSetupViewModel @Inject constructor(
                 
                 // 3. Update Staff document
                 val staffRef = db.collection("staff").document(user.uid)
-                batch.update(staffRef, "sedesAutorizadas", listOf(sedeId))
+                batch.update(staffRef, "sedesAutorizadas", com.google.firebase.firestore.FieldValue.arrayUnion(sedeId))
                 
                 batch.commit().await()
                 

@@ -1,17 +1,21 @@
 package com.example.arena.ui.auth.login
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.arena.Model.Di.Daos.UserDao
-import com.example.arena.Model.Di.Domain.UserMapper
+import com.example.arena.domain.User
 import com.example.arena.Model.Di.Mappers.ToEntity
 import com.example.arena.R
+import com.example.arena.util.staffDocument
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -21,24 +25,27 @@ import kotlinx.coroutines.withContext
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
-
-
-
-sealed interface LoginState{
+/**
+ * Estados del flujo de autenticación.
+ */
+sealed interface LoginState {
     data object Idle : LoginState
-    data object Loading: LoginState
-    data object Success: LoginState
-    data object StaffSuccess: LoginState
-    data class  Error(val message: String): LoginState
+    data object Loading : LoginState
+    data object Success : LoginState
+    data object StaffSuccess : LoginState
+    data class Error(val message: String) : LoginState
 }
+
+/**
+ * ViewModel que gestiona la lógica de inicio de sesión para Atletas y Personal (Staff).
+ */
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val auth: FirebaseAuth,
+    private val db: FirebaseFirestore,
     @ApplicationContext private val context: Context,
     private val userDao: UserDao
-
 ) : ViewModel() {
-
 
     var uiState: LoginState by mutableStateOf(LoginState.Idle)
         private set
@@ -48,15 +55,30 @@ class LoginViewModel @Inject constructor(
     }
 
     private fun checkActiveSession() {
-        val currentUser = auth.currentUser
-        if (currentUser != null) {
-            // Podríamos validar si el usuario está en la DB local si quisiéramos persistencia total
-            uiState = LoginState.Success
+        viewModelScope.launch {
+            val user = withContext(Dispatchers.IO) {
+                userDao.getRememberedUser()
+            }
+            if (user != null && user.isRemembered) {
+                saveFcmToken(user.uid, isStaff = (user.role == "STAFF"))
+                if (user.role == "STAFF") {
+                    uiState = LoginState.StaffSuccess
+                } else {
+                    uiState = LoginState.Success
+                }
+            } else if (auth.currentUser != null) {
+                saveFcmToken(auth.currentUser!!.uid, isStaff = false)
+                uiState = LoginState.Success
+            }
         }
     }
 
-    fun loginUsuario(email: String, password: String, rememberMe: Boolean){
-        if (email.isBlank() || password.isBlank()){
+    /**
+     * Inicia sesión como Atleta usando Email y Contraseña.
+     */
+    fun loginUsuario(email: String, password: String, rememberMe: Boolean) {
+        resetLoginState()
+        if (email.isBlank() || password.isBlank()) {
             uiState = LoginState.Error(context.getString(R.string.campo_vacio))
             return
         }
@@ -65,16 +87,11 @@ class LoginViewModel @Inject constructor(
 
         viewModelScope.launch {
             try {
-                delay(2000)
-                // 🎯 El métod o signInWithEmailAndPassword de Firebase se encarga de verificar
-                // que el email y la contraseña coincidan con los datos registrados.
                 val authResult = auth.signInWithEmailAndPassword(email, password).await()
                 val firebaseUser = authResult.user
 
                 if (firebaseUser != null) {
-                    // Si el login es exitoso en Firebase, mapeamos los datos básicos
-                    // NOTA: Para obtener name/lastName reales, se debería consultar Firestore o Realtime DB
-                    val loggedUser = UserMapper(
+                    val loggedUser = User(
                         id = firebaseUser.uid,
                         email = firebaseUser.email ?: email,
                         name = firebaseUser.displayName ?: "Atleta",
@@ -83,133 +100,167 @@ class LoginViewModel @Inject constructor(
                     )
 
                     withContext(Dispatchers.IO) {
-                        if (rememberMe) {
-                            // Guardamos localmente solo si "Remember Me" está activo
-                            userDao.insertUser(loggedUser.ToEntity(isRemebered = true))
-                        } else {
-                            // Si no, nos aseguramos de que no haya basura de sesiones anteriores
-                            userDao.deleteUser()
-                        }
+                        userDao.deleteUser()
+                        userDao.insertUser(loggedUser.ToEntity(isRemembered = rememberMe))
                     }
+                    saveFcmToken(firebaseUser.uid, isStaff = false)
                     uiState = LoginState.Success
                 } else {
                     uiState = LoginState.Error(context.getString(R.string.autenticacion_fallida))
                 }
             } catch (e: Exception) {
-                // Si Firebase devuelve error (ej. credenciales incorrectas), lo capturamos aquí
                 uiState = LoginState.Error(e.localizedMessage ?: context.getString(R.string.autenticacion_fallida))
             }
         }
     }
 
+    /**
+     * Inicia sesión con Google.
+     */
     fun loginWithGoogle(idToken: String) {
         uiState = LoginState.Loading
-
         viewModelScope.launch {
             try {
-                delay(2000)
                 val credential = GoogleAuthProvider.getCredential(idToken, null)
                 val authResult = auth.signInWithCredential(credential).await()
                 val firebaseUser = authResult.user
 
                 if (firebaseUser != null) {
-                    val displayName = firebaseUser.displayName ?: "Atleta de Arena"
-                    val nameParts = displayName.split(" ", limit = 2)
-                    val firstName = nameParts.getOrNull(0) ?: displayName
-                    val lastName = nameParts.getOrNull(1) ?: ""
-
-                    val loggedUser = UserMapper(
+                    val loggedUser = User(
                         id = firebaseUser.uid,
                         email = firebaseUser.email ?: "",
-                        name = firstName.uppercase(),
-                        lastName = lastName.uppercase(),
+                        name = (firebaseUser.displayName ?: "ATLETA").uppercase(),
+                        lastName = "",
                         role = "ATHLETE",
                     )
 
                     withContext(Dispatchers.IO) {
-                        // Por defecto con Google solemos recordar al usuario
-                        userDao.insertUser(loggedUser.ToEntity(isRemebered = true))
+                        userDao.deleteUser()
+                        userDao.insertUser(loggedUser.ToEntity(isRemembered = true))
                     }
+                    saveFcmToken(firebaseUser.uid, isStaff = false)
                     uiState = LoginState.Success
-                } else {
-                    uiState = LoginState.Error("Error al obtener el usuario de Google")
                 }
             } catch (e: Exception) {
-                uiState = LoginState.Error(e.localizedMessage ?: "Error en la autenticación con Google")
+                uiState = LoginState.Error(e.localizedMessage ?: "Error con Google")
             }
         }
     }
 
+    /**
+     * Autentica a un miembro del Personal (Staff) validando su ID, Código y Rol en Firestore.
+     */
+    fun authenticateStaff(clearanceID: String, accessCode: String, onResult: (Boolean, String?) -> Unit) {
+        resetLoginState()
+        if (clearanceID.isBlank() || accessCode.isBlank()) {
+            onResult(false, context.getString(R.string.campo_vacio))
+            return
+        }
 
-fun resetLoginState(){
-    uiState = LoginState.Idle
-}
+        uiState = LoginState.Loading
+
+        // Referencia directa al documento en la colección 'staff' (ej. staff/admin2026)
+        db.collection("staff").document(clearanceID).get()
+            .addOnSuccessListener { document ->
+                if (!document.exists()) {
+                    uiState = LoginState.Error("ID de administrador no encontrado")
+                    onResult(false, "ID no encontrado")
+                    return@addOnSuccessListener
+                }
+
+                val isActive = document.getBoolean("isActive") ?: false
+                val storeCode = document.getString("accessCode")
+                val role = document.getString("role") ?: ""
+                val expiryDate = document.getString("expireDate") ?: "2099-12-31"
+                val today = java.time.LocalDate.now().toString()
+
+                if (!isActive) {
+                    uiState = LoginState.Error("Acceso de personal desactivado")
+                    onResult(false, "Desactivado")
+                } else if (role != "STAFF" && role != "ADMIN") {
+                    uiState = LoginState.Error("El usuario no tiene rol de STAFF")
+                    onResult(false, "Rol inválido")
+                } else if (accessCode != storeCode) {
+                    uiState = LoginState.Error("Código de acceso incorrecto")
+                    onResult(false, "Código Incorrecto")
+                } else if (expiryDate < today) {
+                    uiState = LoginState.Error("Acceso expirado")
+                    onResult(false, "Expirado")
+                } else {
+                    viewModelScope.launch {
+                        // Creamos el objeto de usuario para la sesión local
+                        val staffUser = User(
+                            id = clearanceID, // admin2026
+                            email = document.getString("email") ?: "staff@arena.com",
+                            name = document.getString("nombre") ?: "ADMINISTRADOR",
+                            lastName = "",
+                            role = "STAFF"
+                        )
+                        
+                        // Guardamos en Room para persistir la sesión
+                        withContext(Dispatchers.IO) {
+                            userDao.deleteUser()
+                            userDao.insertUser(staffUser.ToEntity(isRemembered = true))
+                        }
+                        
+                        saveFcmToken(clearanceID, isStaff = true)
+                        uiState = LoginState.StaffSuccess
+                        onResult(true, "Bienvenido al Centro de Mando")
+                    }
+                }
+            }
+            .addOnFailureListener { e ->
+                uiState = LoginState.Error(e.localizedMessage ?: "Error de conexión con el servidor")
+                onResult(false, "Error de red")
+            }
+    }
+
+    /**
+     * Valida si un ID de usuario corresponde a un Staff activo en Firestore.
+     */
+    suspend fun esStaff(uid: String): Boolean {
+        return try {
+            val doc = db.staffDocument(uid).get().await()
+            doc.exists() && (doc.getBoolean("isActive") ?: false)
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    /**
+     * Obtiene el token FCM actual y lo guarda en el documento del usuario (staff o user).
+     */
+    private fun saveFcmToken(userId: String, isStaff: Boolean) {
+        viewModelScope.launch {
+            try {
+                val token = FirebaseMessaging.getInstance().token.await()
+                val collection = if (isStaff) "staff" else "user"
+                db.collection(collection).document(userId)
+                    .update("fcmToken", token)
+                    .await()
+                Log.d("LoginViewModel", "FCM Token guardado en $collection/$userId")
+            } catch (e: Exception) {
+                Log.e("LoginViewModel", "Error al guardar FCM Token", e)
+            }
+        }
+    }
+
+    fun resetLoginState() {
+        uiState = LoginState.Idle
+    }
 
     fun resetPassword(email: String, onResult: (Boolean, String?) -> Unit) {
         if (email.isBlank()) {
             onResult(false, "El correo no puede estar vacío")
             return
         }
-
-
         auth.sendPasswordResetEmail(email)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    onResult(true, "Se ha enviado un link a tu correo")
+                    onResult(true, "Enlace enviado")
                 } else {
-                    onResult(false, task.exception?.message ?: "Error al enviar el correo")
+                    onResult(false, task.exception?.message ?: "Error")
                 }
             }
     }
-
-    fun authenticateStaff(clearanceID: String, accessCode: String, onResult: (Boolean, String?) -> Unit) {
-        if (clearanceID.isBlank() || accessCode.isBlank()) {
-            onResult(false, "Por favor completa todos los campos")
-            return
-        }
-
-        uiState = LoginState.Loading
-
-        val db = com.google.firebase.firestore.FirebaseFirestore.getInstance()
-
-        db.collection("staff").document(clearanceID).get()
-            .addOnSuccessListener { document ->
-                if (!document.exists()) {
-                    uiState = LoginState.Idle
-                    onResult(false, "ID de administrador no encontrado")
-                    return@addOnSuccessListener
-                }
-
-                val isActive = document.getBoolean("isActive") ?: false
-                val storeCode = document.getString("accessCode")
-                val expiryDate = document.getString("expireDate") ?: "2099-12-31"
-                val today = java.time.LocalDate.now().toString()
-
-                when {
-                    !isActive -> {
-                        uiState = LoginState.Idle
-                        onResult(false, "Acceso desactivado")
-                    }
-                    accessCode != storeCode -> {
-                        uiState = LoginState.Idle
-                        onResult(false, "Código Incorrecto")
-                    }
-                    expiryDate < today -> {
-                        uiState = LoginState.Idle
-                        onResult(false, "Código Expirado")
-                    }
-                    else -> {
-                        uiState = LoginState.StaffSuccess
-                        onResult(true, "Acceso concedido")
-                    }
-                }
-            }
-            .addOnFailureListener { e ->
-                uiState = LoginState.Error(e.localizedMessage ?: "Error de conexión")
-                onResult(false, "Error de conexión ${e.localizedMessage}")
-            }
-    }
-
-
-
 }

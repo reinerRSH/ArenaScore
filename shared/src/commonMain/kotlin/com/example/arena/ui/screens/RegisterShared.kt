@@ -1,36 +1,35 @@
 package com.example.arena.ui.screens
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.arena.ui.theme.*
+import com.example.arena.ui.components.OutlinedTextFieldShared
 
 @Composable
 fun RegisterArenaContentShared(
     isLoading: Boolean,
     errorMessage: String?,
+    backgroundPainter: Painter? = null,
     onRegister: (String, String, String, String, String) -> Unit,
     onRegisterGoogle: () -> Unit,
     onBackToLogin: () -> Unit
@@ -47,6 +46,15 @@ fun RegisterArenaContentShared(
         modifier = Modifier.fillMaxSize().background(ArenaBackground),
         contentAlignment = Alignment.Center
     ) {
+        if (backgroundPainter != null) {
+            Image(
+                painter = backgroundPainter,
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+        }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -58,20 +66,21 @@ fun RegisterArenaContentShared(
 
             Text(
                 text = "ÚNETE A ARENA",
-                fontSize = 36.sp,
-                lineHeight = 42.sp,
+                fontSize = 28.sp,
+                lineHeight = 32.sp,
                 fontWeight = FontWeight.Black,
                 fontStyle = FontStyle.Italic,
                 color = PrimaryNeon,
                 textAlign = TextAlign.Center,
-                letterSpacing = 2.sp
+                letterSpacing = 1.sp,
+                maxLines = 1
             )
             Text(
                 text = "RENDIMIENTO INSTITUCIONAL Y ANALÍTICA",
-                fontSize = 10.sp,
+                fontSize = 9.sp,
                 fontWeight = FontWeight.Bold,
                 color = ArenaTextVariant,
-                letterSpacing = 3.sp,
+                letterSpacing = 2.sp,
                 modifier = Modifier.padding(top = 8.dp, bottom = 32.dp)
             )
 
@@ -124,7 +133,7 @@ fun RegisterArenaContentShared(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                Button(
+            Button(
                     onClick = { onRegister(firstName, lastName, email, password, confirmPassword) },
                     enabled = !isLoading,
                     modifier = Modifier.fillMaxWidth().height(50.dp),
@@ -134,7 +143,7 @@ fun RegisterArenaContentShared(
                     if (isLoading) {
                         CircularProgressIndicator(modifier = Modifier.size(24.dp), color = ArenaOnPrimaryFixed)
                     } else {
-                        Text("REGISTRARSE", fontWeight = FontWeight.Bold, color = ArenaOnPrimaryFixed)
+                        Text("REGISTRARSE", fontWeight = FontWeight.Bold, color = ArenaOnPrimaryFixed, fontSize = 11.sp, maxLines = 1)
                     }
                 }
 
@@ -146,14 +155,14 @@ fun RegisterArenaContentShared(
                     border = BorderStroke(1.dp, ArenaUnfocusedBorder),
                     shape = RoundedCornerShape(8.dp)
                 ) {
-                    Text("Continuar con Google", color = Color.White)
+                    Text("Continuar con Google", color = Color.White, fontSize = 10.sp, maxLines = 1)
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                    Text("¿Ya tienes una cuenta? ", color = ArenaTextVariant, fontSize = 12.sp)
-                    Text("Iniciar sesión", color = PrimaryNeon, fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.clickable { onBackToLogin() })
+                    Text("¿Ya tienes una cuenta? ", color = ArenaTextVariant, fontSize = 11.sp)
+                    Text("Iniciar sesión", color = PrimaryNeon, fontSize = 11.sp, fontWeight = FontWeight.Bold, modifier = Modifier.clickable { onBackToLogin() } )
                 }
             }
         }

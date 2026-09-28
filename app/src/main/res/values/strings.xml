@@ -78,7 +78,7 @@
     <string name="select_button">SELECCIONAR</string>
     <string name="courts_available_format">%1$d CANCHAS DISP.</string>
 
-    <string name="crossfit_label">CROSSFIT</string>
+    <string name="crossfit_label">CENTRO DE ENTRENAMIENTO</string>
     <string name="crossfit_subtitle">CIMENTACIÓN DE ALTA INTENSIDAD</string>
     <string name="live_athletes_format">En vivo: %1$s Atletas</string>
 
@@ -98,4 +98,63 @@
     <string name="desc_menu">Menú</string>
     <string name="desc_enter">Entrar</string>
     <string name="desc_sport_background">Fondo para %1$s</string>
+    <!-- Booking Type Selection -->
+    <string name="booking_type_title">RESERVAR</string>
+    <string name="booking_type_clases">CLASES</string>
+    <string name="booking_type_clases_sub">Entrenamiento personalizado y grupal</string>
+    <string name="booking_type_juego">JUEGO</string>
+    <string name="booking_type_juego_sub">Reserva tu pista para partidos amistosos</string>
+    <string name="booking_type_torneo">TORNEO</string>
+    <string name="booking_type_torneo_sub">Inscríbete en las próximas competiciones</string>
+    <!-- Booking Schedule Selection -->
+    <string name="schedule_title">RESERVAR SESIÓN</string>
+    <string name="schedule_subtitle">Selecciona fecha y hora para asegurar tu reserva.</string>
+    <string name="label_date">FECHA</string>
+    <string name="label_available_slots">TURNOS DISPONIBLES</string>
+    <string name="section_morning">MAÑANA</string>
+    <string name="section_afternoon">TARDE</string>
+    <string name="section_evening">NOCHE</string>
+    <string name="btn_book_now">RESERVAR AHORA</string>
+    <string name="label_total">TOTAL</string>
+    <string name="price_placeholder">$45.00</string>
+    <!-- Pago Móvil VE (Lista Completa) -->
+    <string-array name="bancos_ve">
+        <item>0102 - BANCO DE VENEZUELA</item>
+        <item>0105 - BANCO MERCANTIL</item>
+        <item>0108 - BANCO PROVINCIAL</item>
+        <item>0114 - BANCO DEL CARIBE</item>
+        <item>0115 - BANCO EXTERIOR</item>
+        <item>0116 - BANCO OCCIDENTAL DE DESCUENTO</item>
+        <item>0128 - BANCO CARONI</item>
+        <item>0134 - BANESCO</item>
+        <item>0137 - BANCO SOFITASA</item>
+        <item>0138 - BANCO PLAZA</item>
+        <item>0151 - BFC BANCO FONDO COMÚN</item>
+        <item>0156 - 100% BANCO</item>
+        <item>0157 - BANCO DEL SUR</item>
+        <item>0163 - BANCO DEL TESORO</item>
+        <item>0166 - BANCO AGRÍCOLA DE VENEZUELA</item>
+        <item>0168 - BANCRECER</item>
+        <item>0169 - MI BANCO</item>
+        <item>0171 - BANCO ACTIVO</item>
+        <item>0172 - BANCAMIGA</item>
+        <item>0174 - BANPLUS</item>
+        <item>0175 - BANCO BICENTENARIO</item>
+        <item>0177 - BANFANB</item>
+        <item>0191 - BNC BANCO NACIONAL DE CRÉDITO</item>
+    </string-array>
+
+    <string-array name="documentos_tipo">
+        <item>V</item>
+        <item>E</item>
+        <item>J</item>
+    </string-array>
+
+    <string-array name="operadoras_ve">
+        <item>0412</item>
+        <item>0414</item>
+        <item>0424</item>
+        <item>0416</item>
+        <item>0426</item>
+    </string-array>
 </resources>

@@ -24,4 +24,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "Arena"
 include(":app")
+include(":shared")
  

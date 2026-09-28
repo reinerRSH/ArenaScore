@@ -26,7 +26,8 @@ fun ServiciosRow(
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         servicesList.forEach { item ->
-            if (servicios.contains(item.name)) {
+            // Comparación insensible a mayúsculas para coincidir con Firestore
+            if (servicios.any { it.equals(item.name, ignoreCase = true) }) {
                 Icon(
                     imageVector = item.icon,
                     contentDescription = item.name,

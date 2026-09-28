@@ -15,5 +15,5 @@ data class Court(
     val status: CourtStatus,
     val idTechnical: String,
     val duration: String = "90 MIN",
-    val imageUrl: String = ""
+    val imageUrl: Any = ""
 )

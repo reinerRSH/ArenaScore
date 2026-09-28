@@ -7,7 +7,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.arena.domain.Reserva
-import com.example.arena.navigation.Screen
+import com.example.arena.ui.booking.BookingIntent
 import com.example.arena.ui.booking.BookingScheduleViewModel
 import com.example.arena.ui.home.HomeViewModel
 
@@ -17,8 +17,10 @@ fun BookingScheduleScreen(
     sedeId: String,
     canchaId: String,
     tipoReserva: String,
+    canchaName: String = "",
     viewModel: BookingScheduleViewModel = hiltViewModel(),
-    homeViewModel: HomeViewModel = hiltViewModel()
+    homeViewModel: HomeViewModel = hiltViewModel(),
+    onNavigateBack: () -> Unit = { navController.popBackStack() }
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val notifications by homeViewModel.notifications.collectAsState()
@@ -26,7 +28,7 @@ fun BookingScheduleScreen(
     var selectedReceipt by remember { mutableStateOf<Reserva?>(null) }
 
     LaunchedEffect(sedeId, canchaId, tipoReserva) {
-        viewModel.initBooking(sedeId, canchaId, tipoReserva)
+        viewModel.init(sedeId, canchaId, tipoReserva)
     }
 
     if (selectedReceipt != null) {
@@ -45,24 +47,36 @@ fun BookingScheduleScreen(
         )
     }
 
+    val sharedUiState = BookingScheduleUiStateShared(
+        selectedDate = uiState.selectedDate.toString(),
+        selectedTime = uiState.selectedTime,
+        reservedSlots = uiState.reservedSlots,
+        canchaName = uiState.canchaName,
+        tipoReserva = uiState.tipoReserva,
+        selectedSede = uiState.selectedSede,
+        selectedExtras = uiState.selectedExtras,
+        totalPrice = uiState.totalPrice,
+        paymentReference = uiState.paymentReference,
+        isPaymentSheetVisible = uiState.isPaymentSheetVisible,
+        isConfirmationVisible = uiState.isConfirmationVisible,
+        isLoading = uiState.isLoading
+    )
+
     BookingScheduleContentShared(
-        uiState = uiState,
+        uiState = sharedUiState,
         notifications = notifications,
         onNavigateBack = { navController.popBackStack() },
         onChangeCourt = { navController.popBackStack() },
-        onBookClick = { viewModel.preparePayment() },
-        onDismissConfirmation = { viewModel.dismissConfirmation() },
-        onTimeSelected = { viewModel.selectTime(it) },
-        onToggleExtra = { name, price -> viewModel.toggleExtra(name, price) },
-        onUpdatePaymentRef = { viewModel.updatePaymentReference(it) },
-        onConfirmPayment = { viewModel.confirmBooking() },
-        onDismissPayment = { viewModel.cancelPayment() },
-        onCopyPaymentData = { /* Lógica de copiado ya está en el Shared usualmente */ },
+        onBookClick = { viewModel.handleIntent(BookingIntent.ShowPaymentSheet) },
+        onDismissConfirmation = { viewModel.hideConfirmation() },
+        onTimeSelected = { viewModel.onTimeSelected(it) },
+        onToggleExtra = { name, price -> viewModel.handleIntent(BookingIntent.ToggleExtra(name, price)) },
+        onUpdatePaymentRef = { viewModel.handleIntent(BookingIntent.UpdateReference(it)) },
+        onConfirmPayment = { viewModel.handleIntent(BookingIntent.ConfirmPayment) },
+        onDismissPayment = { viewModel.handleIntent(BookingIntent.HidePaymentSheet) },
+        onCopyPaymentData = { /* Clipboard logic */ },
         onNotificationClick = {
             if (notifications.isNotEmpty()) selectedReceipt = notifications.last()
-        },
-        dateSelectionContent = {
-            // Aquí iría el DatePicker o selector de fecha que ya tienes
         }
     )
 }

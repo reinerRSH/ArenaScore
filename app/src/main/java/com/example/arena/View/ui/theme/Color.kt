@@ -16,6 +16,7 @@ val ArenaUnfocusedBorder = Color(0xFF171616)
 val ArenaStaffBorder = Color(0xFF2D3748)
 val ArenaWarning = Color(0xFFEF4444)
 val ArenaMagenta = Color(0xFFECB1FF) // Magenta de la app
+val ArenaSuccess = Color(0xFF39FF14) // Verde Neón Brillante
 
 
 

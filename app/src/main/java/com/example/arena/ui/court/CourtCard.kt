@@ -17,7 +17,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -90,7 +89,7 @@ fun CourtCard(
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Bold,
-                            fontFamily = FontFamily.Monospace,
+                            
                             color = if (isAvailable) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -107,25 +106,29 @@ fun CourtCard(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
-                            text = court.name,
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            // Punto de estado (Status Dot) para conectar con la leyenda
+                            Box(
+                                modifier = Modifier
+                                    .size(8.dp)
+                                    .background(
+                                        color = if (isAvailable) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.outline,
+                                        shape = RoundedCornerShape(50)
+                                    )
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = court.name,
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
                         
                         if (!isAvailable) {
                             StatusBadge(court.status)
                         }
                     }
-
-                    Text(
-                        text = court.idTechnical,
-                        fontSize = 12.sp,
-                        fontFamily = FontFamily.Monospace,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(top = 2.dp)
-                    )
 
                     Spacer(modifier = Modifier.height(16.dp))
 
@@ -147,14 +150,14 @@ fun CourtCard(
                                 text = "DURACIÓN TURNO",
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.Bold,
-                                fontFamily = FontFamily.Monospace,
+                                
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Text(
                                 text = court.duration,
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Bold,
-                                fontFamily = FontFamily.Monospace,
+                                
                                 color = if (isAvailable) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
@@ -179,7 +182,7 @@ fun CourtCard(
                             Text(
                                 text = if (isAvailable) "SELECCIONAR CANCHA" else "NO DISPONIBLE",
                                 fontWeight = FontWeight.Bold,
-                                fontFamily = FontFamily.Monospace,
+                                
                                 fontSize = 12.sp
                             )
                             Spacer(modifier = Modifier.width(8.dp))
@@ -199,8 +202,8 @@ fun CourtCard(
 @Composable
 fun StatusBadge(status: CourtStatus) {
     val color = when (status) {
-        CourtStatus.AVAILABLE -> MaterialTheme.colorScheme.secondary // Magenta
-        CourtStatus.RESERVED -> MaterialTheme.colorScheme.error
+        CourtStatus.AVAILABLE -> MaterialTheme.colorScheme.tertiary
+        CourtStatus.RESERVED -> MaterialTheme.colorScheme.outline
         CourtStatus.BUSY -> Color(0xFFF59E0B) // Warning/Orange
         CourtStatus.MAINTENANCE -> Color.Gray
     }
@@ -215,7 +218,7 @@ fun StatusBadge(status: CourtStatus) {
             modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
             fontSize = 9.sp,
             fontWeight = FontWeight.Bold,
-            fontFamily = FontFamily.Monospace,
+
             color = color
         )
     }

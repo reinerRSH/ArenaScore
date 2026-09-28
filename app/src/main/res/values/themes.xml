@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
+    <!-- Tema base de la aplicación -->
     <style name="Theme.Arena" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <!-- Tema para la Splash Screen -->
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+        <!-- Fondo de la splash screen -->
+        <item name="windowSplashScreenBackground">#000000</item>
+        <!-- Icono animado -->
+        <item name="windowSplashScreenAnimatedIcon">@drawable/avd_splash_logo</item>
+        <!-- Duración de la animación en ms -->
+        <item name="windowSplashScreenAnimationDuration">800</item>
+        <!-- Tema al que cambiar cuando la app esté lista -->
+        <item name="postSplashScreenTheme">@style/Theme.Arena</item>
+    </style>
 </resources>

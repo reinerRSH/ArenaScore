@@ -1,11 +1,11 @@
 package com.example.arena.Model.Di.Mappers
 
 import com.example.arena.Model.Di.Entitys.UserEntity
-import com.example.arena.Model.Di.Domain.UserMapper
+import com.example.arena.domain.User
 
 
-fun UserEntity.ToDomain(): UserMapper{
-    return UserMapper(
+fun UserEntity.ToDomain(): User {
+    return User(
         id = this.uid,
         email = this.email ?: "",
         lastName= this.lastName,
@@ -15,7 +15,7 @@ fun UserEntity.ToDomain(): UserMapper{
 }
 
 
-fun UserMapper.ToEntity(isRemebered: Boolean): UserEntity{
+fun User.ToEntity(isRemembered: Boolean): UserEntity {
 
     return UserEntity(
         uid = this.id,
@@ -23,6 +23,6 @@ fun UserMapper.ToEntity(isRemebered: Boolean): UserEntity{
         name = this.name,
         lastName = this.lastName,
         role = this.role,
-        isRemenbered = isRemebered
+        isRemembered = isRemembered
     )
 }
