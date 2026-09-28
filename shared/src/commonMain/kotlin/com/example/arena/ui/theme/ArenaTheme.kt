@@ -1,0 +1,18 @@
+package com.example.arena.ui.theme
+
+import androidx.compose.ui.graphics.Color
+
+val ArenaBackground = Color(0xFF0F0F10)
+val ArenaSurfaceBase = Color(0xFF0A0C10)
+val ArenaSurfaceElevated = Color(0xFF141820)
+val ArenaPrimaryContainer = Color(0xFF00F5FF)
+val ArenaOnPrimaryFixed = Color(0xFF002021)
+val ArenaTextPrimary = Color(0xFFDCE4E4)
+val ArenaTextVariant = Color(0xFFB9CACA)
+val ArenaErrorContainer = Color(0xFF93000A)
+val ArenaUnfocusedBorder = Color(0xFF171616)
+val ArenaStaffBorder = Color(0xFF2D3748)
+val ArenaWarning = Color(0xFFEF4444)
+val ArenaMagenta = Color(0xFFECB1FF)
+val ArenaSuccess = Color(0xFF39FF14)
+val PrimaryNeon = Color(0xFF00DCE5)
